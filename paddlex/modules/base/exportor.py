@@ -20,7 +20,7 @@ from .build_model import build_model
 from ...utils.device import update_device_num, set_env_for_device
 from ...utils.misc import AutoRegisterABCMetaClass
 from ...utils.config import AttrDict
-from ...utils.logging import *
+from ...utils import logging
 
 
 def build_exportor(config: AttrDict) -> "BaseExportor":
@@ -71,7 +71,7 @@ class BaseExportor(ABC, metaclass=AutoRegisterABCMetaClass):
 
         config_path = Path(weight_path).parent / "config.yaml"
         if not config_path.exists():
-            warning(
+            logging.warning(
                 f"The config file(`{config_path}`) related to weight file(`{weight_path}`) is not exist, use default instead."
             )
             config_path = None
@@ -117,4 +117,5 @@ exporting!"
         return {
             "weight_path": self.export_config.weight_path,
             "save_dir": self.global_config.output,
+            "device": self.get_device(),
         }

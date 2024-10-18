@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import inspect
+from abc import ABC, abstractmethod
 from copy import deepcopy
-from abc import ABC
 from types import GeneratorType
 
 from ...utils import logging
@@ -49,7 +49,10 @@ class BaseComponent(ABC):
                         yield item
 
             # output may be a generator, when the apply() uses yield
-            if isinstance(output, GeneratorType):
+            if (
+                isinstance(output, GeneratorType)
+                or output.__class__.__name__ == "generator"
+            ):
                 # if output is a generator, use for-in to get every one batch output data and yield one by one
                 for each_output in output:
                     reassemble_data = self._check_output(each_output, input_)
@@ -256,6 +259,10 @@ class BaseComponent(ABC):
     @property
     def name(self):
         return getattr(self, "NAME", self.__class__.__name__)
+
+    @abstractmethod
+    def apply(self, input):
+        raise NotImplementedError
 
 
 class ComponentsEngine(object):

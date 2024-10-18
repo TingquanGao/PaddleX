@@ -23,6 +23,8 @@ lxml
 openpyxl
 premailer
 PyMuPDF
+ujson
+Pillow
 ######## For Chatocrv3 #######
 qianfan==0.0.3
 langchain==0.1.5
@@ -31,3 +33,4 @@ erniebot == 0.5.0
 erniebot-agent == 0.5.0
 unstructured
 networkx
+faiss-cpu

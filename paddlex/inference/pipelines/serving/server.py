@@ -12,19 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-class BatchSizeSetMixin:
-    def set_batch_size(self, batch_size):
-        self.components["ReadCmp"].batch_size = batch_size
+import uvicorn
+from fastapi import FastAPI
 
 
-class DeviceSetMixin:
-    def set_device(self, device):
-        self.pp_option.set_device(device)
-        self.components["PPEngineCmp"].option = self.pp_option
-
-
-class PPOptionSetMixin:
-    def set_pp_option(self, pp_option):
-        self.pp_option = pp_option
-        self.components["PPEngineCmp"].option = self.pp_option
+def run_server(app: FastAPI, *, host: str, port: int, debug: bool) -> None:
+    # XXX: Currently, `debug` is not used.
+    # HACK: Fix duplicate logs
+    uvicorn_version = tuple(int(x) for x in uvicorn.__version__.split("."))
+    if uvicorn_version < (0, 19, 0):
+        uvicorn.config.LOGGING_CONFIG["loggers"]["uvicorn"]["propagate"] = False
+    uvicorn.run(app, host=host, port=port, log_level="info")

@@ -12,22 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
-from typing import Any, Dict, Optional
+from abc import ABC, abstractmethod
+from contextvars import ContextVar, copy_context
+from typing import TypedDict, Type
 
 from ...utils.subclass_register import AutoRegisterABCMetaClass
 from ..models import create_predictor
 
+pipeline_info_list_var = ContextVar("pipeline_info_list", default=None)
 
-class BasePipeline(ABC, metaclass=AutoRegisterABCMetaClass):
+
+class _PipelineInfo(TypedDict):
+    cls: Type["BasePipeline"]
+
+
+class _PipelineMetaClass(AutoRegisterABCMetaClass):
+    def __new__(mcs, name, bases, attrs):
+        def _patch_init_func(init_func):
+            def _patched___init__(self, *args, **kwargs):
+                ctx = copy_context()
+                pipeline_info_list = [
+                    *ctx.get(pipeline_info_list_var, []),
+                    _PipelineInfo(cls=type(self)),
+                ]
+                ctx.run(pipeline_info_list_var.set, pipeline_info_list)
+                ret = ctx.run(init_func, self, *args, **kwargs)
+                return ret
+
+            return _patched___init__
+
+        cls = super().__new__(mcs, name, bases, attrs)
+        cls.__init__ = _patch_init_func(cls.__init__)
+        return cls
+
+
+class BasePipeline(ABC, metaclass=_PipelineMetaClass):
     """Base Pipeline"""
 
     __is_base = True
 
-    def __init__(self, predictor_kwargs) -> None:
+    def __init__(self, device, predictor_kwargs={}) -> None:
         super().__init__()
-        self._predictor_kwargs = {} if predictor_kwargs is None else predictor_kwargs
+        self._predictor_kwargs = predictor_kwargs
+        self._device = device
 
+    @abstractmethod
     def set_predictor():
         raise NotImplementedError(
             "The method `set_predictor` has not been implemented yet."
@@ -37,5 +66,21 @@ class BasePipeline(ABC, metaclass=AutoRegisterABCMetaClass):
     def __call__(self, *args, **kwargs):
         yield from self.predict(*args, **kwargs)
 
-    def _create_model(self, *args, **kwargs):
-        return create_predictor(*args, **kwargs, **self._predictor_kwargs)
+    def _create(self, model=None, pipeline=None, *args, **kwargs):
+        if model:
+            return create_predictor(
+                *args,
+                model=model,
+                device=self._device,
+                **kwargs,
+                **self._predictor_kwargs
+            )
+        elif pipeline:
+            return pipeline(
+                *args,
+                device=self._device,
+                predictor_kwargs=self._predictor_kwargs,
+                **kwargs
+            )
+        else:
+            raise Exception()

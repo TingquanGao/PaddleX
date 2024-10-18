@@ -7,7 +7,7 @@
 
 ![](https://github.com/user-attachments/assets/90cb740b-7741-4383-bc4c-663f9d042d02)
 
-文档场景信息抽取v3**产线中包含表格结构识别模块、版面区域检测模块、文本检测模块、文本识别模块、印章文本检测模块、文本图像矫正模块、文档图像方向分类模块**。
+文档场景信息抽取v3产线中包含**表格结构识别模块**、**版面区域检测模块**、**文本检测模块**、**文本识别模块**、**印章文本检测模块**、**文本图像矫正模块**、**文档图像方向分类模块**。
 
 **如您更考虑模型精度，请选择精度较高的模型，如您更考虑模型推理速度，请选择推理速度较快的模型，如您更考虑模型存储大小，请选择存储大小较小的模型**。其中部分模型的 benchmark 如下：
 
@@ -21,7 +21,7 @@
     <th>模型</th>
     <th>精度（%）</th>
     <th>GPU推理耗时 (ms)</th>
-    <th>CPU推理耗时</th>
+    <th>CPU推理耗时（ms）</th>
     <th>模型存储大小 (M)</th>
     <th>介绍</th>
   </tr>
@@ -48,32 +48,100 @@
 
 **版面区域检测模块模型：**
 
-|模型名称|mAP（%）|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
-|-|-|-|-|-|
-|PicoDet_layout_1x|86.8|13.036|91.2634|7.4M |
-|PicoDet-L_layout_3cls|89.3|15.7425|159.771|22.6 M|
-|RT-DETR-H_layout_3cls|95.9|114.644|3832.62|470.1M|
-|RT-DETR-H_layout_17cls|92.6|115.126|3827.25|470.2M|
+|模型|mAP(0.5)（%）|GPU推理耗时（ms）|CPU推理耗时 (ms)|模型存储大小（M）|介绍|
+|-|-|-|-|-|-|
+|PicoDet_layout_1x|86.8|13.0|91.3|7.4|基于PicoDet-1x在PubLayNet数据集训练的高效率版面区域定位模型，可定位包含文字、标题、表格、图片以及列表这5类区域|
+|PicoDet-L_layout_3cls|89.3|15.7|159.8|22.6|基于PicoDet-L在中英文论文、杂志和研报等场景上自建数据集训练的高效率版面区域定位模型，包含3个类别：表格，图像和印章|
+|RT-DETR-H_layout_3cls|95.9|114.6|3832.6|470.1|基于RT-DETR-H在中英文论文、杂志和研报等场景上自建数据集训练的高精度版面区域定位模型，包含3个类别：表格，图像和印章|
+|RT-DETR-H_layout_17cls|92.6|115.1|3827.2|470.2|基于RT-DETR-H在中英文论文、杂志和研报等场景上自建数据集训练的高精度版面区域定位模型，包含17个版面常见类别，分别是：段落标题、图片、文本、数字、摘要、内容、图表标题、公式、表格、表格标题、参考文献、文档标题、脚注、页眉、算法、页脚、印章|
 
-**注：以上精度指标的评估集是 PaddleX 自建的版面区域分析数据集，包含 1w 张图片。以上所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
+
+**注：以上精度指标的评估集是 PaddleOCR 自建的版面区域分析数据集，包含中英文论文、杂志和研报等常见的 1w 张文档类型图片。GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为 8，精度类型为 FP32。**
 
 **文本检测模块模型：**
 
-|模型名称|检测Hmean（%）|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
-|-|-|-|-|-|
-|PP-OCRv4_mobile_det |77.79|10.6923|120.177|4.2 M|
-|PP-OCRv4_server_det |82.69|83.3501|2434.01|100.1M|
+|模型|检测Hmean（%）|GPU推理耗时（ms）|CPU推理耗时 (ms)|模型存储大小（M)|介绍|
+|-|-|-|-|-|-|
+|PP-OCRv4_server_det|82.69|83.3501|2434.01|109|PP-OCRv4 的服务端文本检测模型，精度更高，适合在性能较好的服务器上部署|
+|PP-OCRv4_mobile_det|77.79|10.6923|120.177|4.7|PP-OCRv4 的移动端文本检测模型，效率更高，适合在端侧设备部署|
 
 **注：以上精度指标的评估集是 PaddleOCR 自建的中文数据集，覆盖街景、网图、文档、手写多个场景，其中检测包含 500 张图片。以上所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
 
 **文本识别模块模型：**
 
-|模型名称|识别Avg Accuracy(%)|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
-|-|-|-|-|-|
-|PP-OCRv4_mobile_rec |78.20|7.95018|46.7868|10.6 M|
-|PP-OCRv4_server_rec |79.20|7.19439|140.179|71.2 M|
+<table >
+    <tr>
+        <th>模型</th>
+        <th>识别 Avg Accuracy(%)</th>
+        <th>GPU推理耗时（ms）</th>
+        <th>CPU推理耗时 (ms)</th>
+        <th>模型存储大小（M）</th>
+        <th>介绍</th>
+    </tr>
+    <tr>
+        <td>PP-OCRv4_mobile_rec</td>
+        <td>78.20</td>
+        <td>7.95018</td>
+        <td>46.7868</td>
+        <td>10.6 M</td>
+        <td rowspan="2">PP-OCRv4是百度飞桨视觉团队自研的文本识别模型PP-OCRv3的下一个版本，通过引入数据增强方案、GTC-NRTR指导分支等策略，在模型推理速度不变的情况下，进一步提升了文本识别精度。该模型提供了服务端（server）和移动端（mobile）两个不同版本，来满足不同场景下的工业需求。</td>
+    </tr>
+    <tr>
+        <td>PP-OCRv4_server_rec </td>
+        <td>79.20</td>
+        <td>7.19439</td>
+        <td>140.179</td>
+        <td>71.2 M</td>
+    </tr>
+</table>
 
-**注：以上精度指标的评估集是 PaddleOCR 自建的中文数据集 ，覆盖街景、网图、文档、手写多个场景，其中文本识别包含 1.1w 张图片。以上所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
+**注：以上精度指标的评估集是 PaddleOCR 自建的中文数据集，覆盖街景、网图、文档、手写多个场景，其中文本识别包含 1.1w 张图片。所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
+
+
+<table >
+    <tr>
+        <th>模型</th>
+        <th>识别 Avg Accuracy(%)</th>
+        <th>GPU推理耗时（ms）</th>
+        <th>CPU推理耗时（ms）</th>
+        <th>模型存储大小（M）</th>
+        <th>介绍</th>
+    </tr>
+    <tr>
+        <td>ch_SVTRv2_rec</td>
+        <td>68.81</td>
+        <td>8.36801</td>
+        <td>165.706</td>
+        <td>73.9 M</td>
+        <td rowspan="1">
+        SVTRv2 是一种由复旦大学视觉与学习实验室（FVL）的OpenOCR团队研发的服务端文本识别模型，其在PaddleOCR算法模型挑战赛 - 赛题一：OCR端到端识别任务中荣获一等奖，A榜端到端识别精度相比PP-OCRv4提升6%。
+    </td>
+    </tr>
+</table>
+
+
+**注：以上精度指标的评估集是 [PaddleOCR算法模型挑战赛 - 赛题一：OCR端到端识别任务](https://aistudio.baidu.com/competition/detail/1131/0/introduction)A榜。 所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
+
+<table >
+    <tr>
+        <th>模型</th>
+        <th>识别 Avg Accuracy(%)</th>
+        <th>GPU推理耗时（ms）</th>
+        <th>CPU推理耗时（ms）</th>
+        <th>模型存储大小（M）</th>
+        <th>介绍</th>
+    </tr>
+    <tr>
+        <td>ch_RepSVTR_rec</td>
+        <td>65.07</td>
+        <td>10.5047</td>
+        <td>51.5647</td>
+        <td>22.1 M</td>
+        <td rowspan="1">    RepSVTR 文本识别模型是一种基于SVTRv2 的移动端文本识别模型，其在PaddleOCR算法模型挑战赛 - 赛题一：OCR端到端识别任务中荣获一等奖，B榜端到端识别精度相比PP-OCRv4提升2.5%，推理速度持平。</td>
+    </tr>
+</table>
+
+**注：以上精度指标的评估集是 [PaddleOCR算法模型挑战赛 - 赛题一：OCR端到端识别任务](https://aistudio.baidu.com/competition/detail/1131/0/introduction)B榜。 所有模型 GPU 推理耗时基于 NVIDIA Tesla T4 机器，精度类型为 FP32， CPU 推理速度基于 Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz，线程数为8，精度类型为 FP32。**
 
 **印章文本检测模块模型：**
 
@@ -115,27 +183,37 @@ PaddleX 所提供的预训练的模型产线均可以快速体验效果，你可
 如果您对产线运行的效果满意，可以直接对产线进行集成部署，如果不满意，您也可以利用私有数据**对产线中的模型进行在线微调**。
 
 ### 2.2 本地体验
-在本地使用文档场景信息抽取v3产线前，请确保您已经按照[PaddleX本地安装教程](https://ku.baidu-int.com/knowledge/HFVrC7hq1Q/pKzJfZczuc/GvMbk70MZz/dF1VvOPZmZXXzn?t=mention&mt=doc&dt=doc)完成了PaddleX的wheel包安装。
+在本地使用文档场景信息抽取v3产线前，请确保您已经按照[PaddleX本地安装教程](../../../installation/installation.md)完成了PaddleX的wheel包安装。
 
 几行代码即可完成产线的快速推理，使用 [测试文件](https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/contract.pdf)，以通用文档场景信息抽取v3产线为例：
 
 ```python
 from paddlex import create_pipeline
 
-predict = create_pipeline( pipeline="PP-ChatOCRv3-doc",
-                            llm_name="ernie-3.5",
-                            llm_params = {"api_type":"qianfan","ak":"","sk":""} )  ## 请填入您的ak与sk，否则无法调用大模型
-                            
-visual_result, visual_inf = predict(["contract.pdf"])
+pipeline = create_pipeline(
+    pipeline="PP-ChatOCRv3-doc",
+    llm_name="ernie-3.5",
+    llm_params={"api_type": "qianfan", "ak": "", "sk": ""} # 请填入您的ak与sk，否则无法调用大模型
+    # llm_params={"api_type": "aistudio", "access_token": ""} # 请填入您的access_token，否则无法调用大模型
+    )
+
+visual_result, visual_info = pipeline.visual_predict("https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/contract.pdf")
 
 for res in visual_result:
     res.save_to_img("./output")
     res.save_to_html('./output')
     res.save_to_xlsx('./output')
 
-print(predict.chat("乙方,手机号"))
+vector = pipeline.build_vector(visual_info=visual_info)
+
+chat_result = pipeline.chat(
+    key_list=["乙方", "手机号"],
+    visual_info=visual_info,
+    vector=vector,
+    )
+chat_result.print()
 ```
-**注**：请先在[百度云千帆平台](https://qianfan.cloud.baidu.com/)获取自己的ak与sk，将其填入至指定位置后才能正常调用大模型。
+**注**：目前仅支持文心大模型，支持在[百度云千帆平台](https://console.bce.baidu.com/qianfan/ais/console/onlineService)或者[星河社区 AIStudio](https://aistudio.baidu.com/)上获取相关的 ak/sk(access_token)。如果使用百度云千帆平台，可以参考[AK和SK鉴权调用API流程](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Hlwerugt8) 获取ak/sk，如果使用星河社区 AIStudio，可以在[星河社区 AIStudio 访问令牌](https://aistudio.baidu.com/account/accessToken)中获取 access_token。
 
 运行后，输出结果如下：
 
@@ -143,68 +221,74 @@ print(predict.chat("乙方,手机号"))
 {'chat_res': {'乙方': '股份测试有限公司', '手机号': '19331729920'}, 'prompt': ''}
 ```
 
-在上述 Python 脚本中，执行了如下几个步骤：
+在上述 Python 脚本中，执行了如下四个步骤：
 
-（1）实例化 `create_pipeline` 实例化文档场景信息抽取v3产线对象：具体参数说明如下：
+（1）调用 `create_pipeline` 方法实例化文档场景信息抽取v3产线对象，相关参数说明如下：
 
-|参数|参数说明|默认值|参数类型|
+|参数|参数类型|默认值|参数说明|
 |-|-|-|-|
-|`pipeline`|产线名称或是产线配置文件路径。如为产线名称，则必须为 PaddleX 所支持的产线。|无|str|
-|`llm_name`|大语言模型名称|"ernie-3.5"|str|
-|`llm_params`|api配置|{}|dict|
-|`device(kwargs)`|运行设备（None为自动适配）|None|str/None|
+|`pipeline`|str|无|产线名称或是产线配置文件路径，如为产线名称，则必须为 PaddleX 所支持的产线；|
+|`llm_name`|str|"ernie-3.5"|大语言模型名称，目前支持`ernie-4.0`，`ernie-3.5`，更多模型支持中;|
+|`llm_params`|dict|`{}`|LLM相关API配置；|
+|`device`|str、None|`None`|运行设备（`None`为自动适配）；|
 
-（2）调用文档场景信息抽取v3产线对象的 `predict` 方法进行推理预测：`predict` 方法参数为`x`，用于输入待预测数据，支持多种输入方式，具体示例如下：
+（2）调用文档场景信息抽取v3产线对象的 `visual_predict` 方法进行视觉推理预测，相关参数说明如下：
 
-|参数类型|参数说明|
-|-|-|
-|Python Var|支持直接传入Python变量，如numpy.ndarray表示的图像数据；|
-|str|支持传入待预测数据文件路径，如图像文件的本地路径：/root/data/img.jpg；|
-|str|支持传入待预测数据文件url，如[示例](https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/contract.pdf)；|
-|str|支持传入本地目录，该目录下需包含待预测数据文件，如本地路径：/root/data/；|
-|dict|支持传入字典类型，字典的key需要与具体产线对应，如文档场景信息抽取v3产线为"img"，字典的val支持上述类型数据，如：{"img": "/root/data1"}；|
-|list|支持传入列表，列表元素需为上述类型数据，如[numpy.ndarray, numpy.ndarray, ]，["/root/data/img1.jpg", "/root/data/img2.jpg", ]，["/root/data1", "/root/data2", ]，[{"img": "/root/data1"}, {"img": "/root/data2/img.jpg"}, ]；|
-|use_oricls_model|是否使用方向分类模型 (默认是False)|
-|use_curve_model|是否使用弯曲文本检测产线 (默认是False)|
-|use_uvdoc_model|是否使用版面矫正产线 (默认是False)|
+|参数|参数类型|默认值|参数说明|
+|-|-|-|-|
+|`input`|Python Var|无|用于输入待预测数据，支持直接传入Python变量，如`numpy.ndarray`表示的图像数据；|
+|`input`|str|无|用于输入待预测数据，支持传入待预测数据文件路径，如图像文件的本地路径：`/root/data/img.jpg`；|
+|`input`|str|无|用于输入待预测数据，支持传入待预测数据文件url，如`https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/contract.pdf`；|
+|`input`|str|无|用于输入待预测数据，支持传入本地目录，该目录下需包含待预测数据文件，如本地路径：`/root/data/`；|
+|`input`|dict|无|用于输入待预测数据，支持传入字典类型，字典的key需要与具体产线对应，如文档场景信息抽取v3产线为"img"，字典的val支持上述类型数据，如：`{"img": "/root/data1"}`；|
+|`input`|list|无|用于输入待预测数据，支持传入列表，列表元素需为上述类型数据，如`[numpy.ndarray, numpy.ndarray]`，`["/root/data/img1.jpg", "/root/data/img2.jpg"]`，`["/root/data1", "/root/data2"]`，`[{"img": "/root/data1"}, {"img": "/root/data2/img.jpg"}]`；|
+|`use_doc_image_ori_cls_model`|bool|`True`|是否使用方向分类模型；|
+|`use_doc_image_unwarp_model`|bool|`True`|是否使用版面矫正产线；|
+|`use_seal_text_det_model`|bool|`True`|是否使用弯曲文本检测产线；|
 
-（3）调用 `predict` 方法获取预测结果：`predict` 方法为`generator`，因此需要通过调用获得预测结果，`predict`方法以 batch 为单位对数据进行预测，因此预测结果为 list 形式表示的一组预测结果。
+（3）调用视觉推理预测结果对象的相关方法对视觉推理预测结果进行保存，具体方法如下：
 
-（4）调用 `predict.chat` 方法与大模型进行交互，其传入参数为需要抽取信息的关键字（支持多个），因此预测结果为 list 形式表示的一组信息抽取结果。
-
-（5）对预测结果进行处理：每个样本的预测结果均为 dict 类型，且支持打印，或保存为文件，支持保存的类型与具体产线相关，如：
-|方法|说明|方法参数|
+|方法|参数|方法说明|
 |-|-|-|
-|save_to_img|将版面分析、表格识别等结果保存为图片格式的文件|save_path：str类型，保存的文件路径；|
-|save_to_html|将表格识别等结果保存为html格式的文件|save_path：str类型，保存的文件路径；|
-|save_to_xlsx|将表格识别等结果保存为表格格式的文件|save_path：str类型，保存的文件路径；|
+|`save_to_img`|`save_path`|将OCR预测结果、版面分析结果、表格识别结果保存为图片文件，参数`save_path`用于指定保存的路径；|
+|`save_to_html`|`save_path`|将表格识别结果保存为html文件，参数`save_path`用于指定保存的路径；|
+|`save_to_xlsx`|`save_path`|将表格识别结果保存为xlsx文件，参数`save_path`用于指定保存的路径；|
+
+（4）调用文档场景信息抽取v3产线对象的 `chat` 方法与大模型进行交互，相关参数说明如下：
+
+|参数|参数类型|默认值|参数说明|
+|-|-|-|-|
+|`key_list`|str|无|用于查询的关键字（query）；支持“，”或“,”作为分隔符的多个关键字组成的字符串，如“乙方，手机号”；|
+|`key_list`|list|无|用于查询的关键字（query），支持`list`形式表示的一组关键字，其元素为`str`类型；|
 
 在执行上述 Python 脚本时，加载的是默认的文档场景信息抽取v3产线配置文件，若您需要自定义配置文件，可执行如下命令获取：
 
 ```
 paddlex --get_pipeline_config PP-ChatOCRv3-doc
 ```
+
 执行后，文档场景信息抽取v3产线配置文件将被保存在当前路径。若您希望自定义保存位置，可执行如下命令（假设自定义保存位置为 `./my_path` ）：
 
 ```
-paddlex --get_pipeline_config PP-ChatOCRv3-doc --config_save_path ./my_path
+paddlex --get_pipeline_config PP-ChatOCRv3-doc --save_path ./my_path
 ```
+
 获取配置文件后，您即可对文档场景信息抽取v3产线各项配置进行自定义：
 
-```
+```yaml
 Pipeline:
   layout_model: RT-DETR-H_layout_3cls
   table_model: SLANet_plus
   text_det_model: PP-OCRv4_server_det
   text_rec_model: PP-OCRv4_server_rec
   seal_text_det_model: PP-OCRv4_server_seal_det
-  doc_image_ori_cls_model: null 
-  doc_image_unwarp_model: null 
+  doc_image_ori_cls_model: null
+  doc_image_unwarp_model: null
   llm_name: "ernie-3.5"
-  llm_params: 
+  llm_params:
     api_type: qianfan
-    ak: 
-    sk: 
+    ak:
+    sk:
 ```
 
 在上述配置中，您可以修改产线各模块加载的模型，也可以修改使用的大模型。各模块支持模型列表请参考模块文档，大模型支持列表为：ernie-4.0、ernie-3.5、ernie-3.5-8k、ernie-lite、ernie-tiny-8k、ernie-speed、ernie-speed-128k、ernie-char-8k。
@@ -216,36 +300,46 @@ Pipeline:
 ```python
 from paddlex import create_pipeline
 
-predict = create_pipeline( pipeline="./my_path/PP-ChatOCRv3-doc.yaml",
-                            llm_name="ernie-3.5",
-                            llm_params = {"api_type":"qianfan","ak":"","sk":""} )  ## 请填入您的ak与sk，否则无法调用大模型
-                            
-visual_result, visual_inf = predict(["contract.pdf"])
+pipeline = create_pipeline(
+    pipeline="./my_path/PP-ChatOCRv3-doc.yaml",
+    llm_name="ernie-3.5",
+    llm_params={"api_type": "qianfan", "ak": "", "sk": ""} # 请填入您的ak与sk，否则无法调用大模型
+    # llm_params={"api_type": "aistudio", "access_token": ""} # 请填入您的access_token，否则无法调用大模型
+    )
+
+visual_result, visual_info = pipeline.visual_predict("https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/contract.pdf")
 
 for res in visual_result:
     res.save_to_img("./output")
     res.save_to_html('./output')
     res.save_to_xlsx('./output')
 
-print(predict.chat("乙方,手机号"))
+vector = pipeline.build_vector(visual_info=visual_info)
+
+chat_result = pipeline.chat(
+    key_list=["乙方", "手机号"],
+    visual_info=visual_info,
+    vector=vector,
+    )
+chat_result.print()
 ```
 
 ## 3. 开发集成/部署
 如果产线可以达到您对产线推理速度和精度的要求，您可以直接进行开发集成/部署。
 
-若您需要将产线直接应用在您的Python项目中，可以参考 [2.2 本地体验](#22-python脚本方式集成)中的示例代码。
+若您需要将产线直接应用在您的Python项目中，可以参考 [2.2 本地体验](#22-本地体验)中的示例代码。
 
 此外，PaddleX 也提供了其他三种部署方式，详细说明如下：
 
-🚀 **高性能部署**：在实际生产环境中，许多应用对部署策略的性能指标（尤其是响应速度）有着较严苛的标准，以确保系统的高效运行与用户体验的流畅性。为此，PaddleX 提供高性能推理插件，旨在对模型推理及前后处理进行深度性能优化，实现端到端流程的显著提速，详细的高性能部署流程请参考[PaddleX高性能部署指南](../../../pipeline_deploy/high_performance_deploy.md)。
+🚀 **高性能推理**：在实际生产环境中，许多应用对部署策略的性能指标（尤其是响应速度）有着较严苛的标准，以确保系统的高效运行与用户体验的流畅性。为此，PaddleX 提供高性能推理插件，旨在对模型推理及前后处理进行深度性能优化，实现端到端流程的显著提速，详细的高性能推理流程请参考[PaddleX高性能推理指南](../../../pipeline_deploy/high_performance_inference.md)。
 
 ☁️ **服务化部署**：服务化部署是实际生产环境中常见的一种部署形式。通过将推理功能封装为服务，客户端可以通过网络请求来访问这些服务，以获取推理结果。PaddleX 支持用户以低成本实现产线的服务化部署，详细的服务化部署流程请参考[PaddleX服务化部署指南](../../../pipeline_deploy/service_deploy.md)。
 
 下面是API参考和多语言服务调用示例：
 
-<details>  
-<summary>API参考</summary>  
-  
+<details>
+<summary>API参考</summary>
+
 对于服务提供的所有操作：
 
 - 响应体以及POST请求的请求体均为JSON数据（JSON对象）。
@@ -277,11 +371,11 @@ print(predict.chat("乙方,手机号"))
 
         |名称|类型|含义|是否必填|
         |-|-|-|-|
-        |`image`|`string`|服务可访问的图像文件或PDF文件的URL，或上述类型文件内容的Base64编码结果。对于超过10页的PDF文件，只有前10页的内容会被使用。|是|
+        |`file`|`string`|服务可访问的图像文件或PDF文件的URL，或上述类型文件内容的Base64编码结果。对于超过10页的PDF文件，只有前10页的内容会被使用。|是|
         |`fileType`|`integer`|文件类型。`0`表示PDF文件，`1`表示图像文件。若请求体无此属性，则服务将尝试根据URL自动推断文件类型。|否|
-        |`useOricls`|`boolean`|是否启用文档图像方向分类功能。默认启用该功能。|否|
-        |`useCurve`|`boolean`|是否启用印章文本检测功能。默认启用该功能。|否|
-        |`useUvdoc`|`boolean`|是否启用文本图像矫正功能。默认启用该功能。|否|
+        |`useImgOrientationCls`|`boolean`|是否启用文档图像方向分类功能。默认启用该功能。|否|
+        |`useImgUnwrapping`|`boolean`|是否启用文本图像矫正功能。默认启用该功能。|否|
+        |`useSealTextDet`|`boolean`|是否启用印章文本检测功能。默认启用该功能。|否|
         |`inferenceParams`|`object`|推理参数。|否|
 
         `inferenceParams`的属性如下：
@@ -338,8 +432,8 @@ print(predict.chat("乙方,手机号"))
         |`llmName`|`string`|大语言模型名称。|否|
         |`llmParams`|`object`|大语言模型API参数。|否|
 
-        当前，`llmParams`可以采用如下两种形式之一：
-        
+        当前，`llmParams` 可以采用如下形式：
+
         ```json
         {
           "apiType": "qianfan",
@@ -348,18 +442,11 @@ print(predict.chat("乙方,手机号"))
         }
         ```
 
-        ```json
-        {
-          "apiType": "{aistudio}",
-          "accessToken": "{AI Studio访问令牌}"
-        }
-        ```
-
     - 请求处理成功时，响应体的`result`具有如下属性：
 
         |名称|类型|含义|
         |-|-|-|
-        |`vectorStore`|`object`|向量数据库序列化结果，可用作其他操作的输入。|
+        |`vectorStore`|`string`|向量数据库序列化结果，可用作其他操作的输入。|
 
 - **`retrieveKnowledge`**
 
@@ -372,25 +459,17 @@ print(predict.chat("乙方,手机号"))
         |名称|类型|含义|是否必填|
         |-|-|-|-|
         |`keys`|`array`|关键词列表。|是|
-        |`vectorStore`|`object`|向量数据库序列化结果。由`buildVectorStore`操作提供。|是|
-        |`visionInfo`|`object`|图像中的关键信息。由`analyzeImage`操作提供。|是|
+        |`vectorStore`|`string`|向量数据库序列化结果。由`buildVectorStore`操作提供。|是|
         |`llmName`|`string`|大语言模型名称。|否|
         |`llmParams`|`object`|大语言模型API参数。|否|
 
-        当前，`llmParams`可以采用如下两种形式之一：
-        
+        当前，`llmParams` 可以采用如下形式：
+
         ```json
         {
           "apiType": "qianfan",
           "apiKey": "{千帆平台API key}",
           "secretKey": "{千帆平台secret key}"
-        }
-        ```
-
-        ```json
-        {
-          "apiType": "{aistudio}",
-          "accessToken": "{AI Studio访问令牌}"
         }
         ```
 
@@ -415,15 +494,14 @@ print(predict.chat("乙方,手机号"))
         |`taskDescription`|`string`|提示词任务。|否|
         |`rules`|`string`|提示词规则。用于自定义信息抽取规则，例如规范输出格式。|否|
         |`fewShot`|`string`|提示词示例。|否|
-        |`useVectorStore`|`boolean`|是否启用向量数据库。默认启用。|否|
-        |`vectorStore`|`object`|向量数据库序列化结果。由`buildVectorStore`操作提供。|否|
+        |`vectorStore`|`string`|向量数据库序列化结果。由`buildVectorStore`操作提供。|否|
         |`retrievalResult`|`string`|知识检索结果。由`retrieveKnowledge`操作提供。|否|
         |`returnPrompts`|`boolean`|是否返回使用的提示词。默认启用。|否|
         |`llmName`|`string`|大语言模型名称。|否|
         |`llmParams`|`object`|大语言模型API参数。|否|
 
-        当前，`llmParams`可以采用如下两种形式之一：
-        
+        当前，`llmParams` 可以采用如下形式：
+
         ```json
         {
           "apiType": "qianfan",
@@ -432,18 +510,11 @@ print(predict.chat("乙方,手机号"))
         }
         ```
 
-        ```json
-        {
-          "apiType": "{aistudio}",
-          "accessToken": "{AI Studio访问令牌}"
-        }
-        ```
-
     - 请求处理成功时，响应体的`result`具有如下属性：
 
         |名称|类型|含义|
         |-|-|-|
-        |`chatResult`|`string`|关键信息抽取结果。|
+        |`chatResult`|`object`|关键信息抽取结果。|
         |`prompts`|`object`|使用的提示词。|
 
         `prompts`的属性如下：
@@ -457,11 +528,11 @@ print(predict.chat("乙方,手机号"))
 </details>
 
 <details>
-<summary>多语言调用服务示例</summary>  
+<summary>多语言调用服务示例</summary>
 
-<details>  
-<summary>Python</summary>  
-  
+<details>
+<summary>Python</summary>
+
 ```python
 import base64
 import pprint
@@ -475,109 +546,107 @@ API_KEY = "{千帆平台API key}"
 SECRET_KEY = "{千帆平台secret key}"
 LLM_NAME = "ernie-3.5"
 LLM_PARAMS = {
-    "apiType": "qianfan", 
-    "apiKey": API_KEY, 
+    "apiType": "qianfan",
+    "apiKey": API_KEY,
     "secretKey": SECRET_KEY,
 }
 
+file_path = "./demo.jpg"
+keys = ["电话"]
 
-if __name__ == "__main__":
-    file_path = "./demo.jpg"
-    keys = ["电话"]
+with open(file_path, "rb") as file:
+    file_bytes = file.read()
+    file_data = base64.b64encode(file_bytes).decode("ascii")
 
-    payload = {
-        "file": file_path,
-        "useOricls": True,
-        "useCurve": True,
-        "useUvdoc": True,
-    }
-    resp_vision = requests.post(url=f"{API_BASE_URL}/chatocr-vision", json=payload)
-    if resp_vision.status_code != 200:
-        print(
-            f"Request to chatocr-vision failed with status code {resp_vision.status_code}."
-        )
-        pprint.pp(resp_vision.json())
-        sys.exit(1)
-    result_vision = resp_vision.json()["result"]
+payload = {
+    "file": file_data,
+    "fileType": 1,
+    "useImgOrientationCls": True,
+    "useImgUnwrapping": True,
+    "useSealTextDet": True,
+}
+resp_vision = requests.post(url=f"{API_BASE_URL}/chatocr-vision", json=payload)
+if resp_vision.status_code != 200:
+    print(
+        f"Request to chatocr-vision failed with status code {resp_vision.status_code}."
+    )
+    pprint.pp(resp_vision.json())
+    sys.exit(1)
+result_vision = resp_vision.json()["result"]
 
-    for i, res in enumerate(result_vision["visionResults"]):
-        print("Texts:")
-        pprint.pp(res["texts"])
-        print("Tables:")
-        pprint.pp(res["tables"])
-        ocr_img_path = f"ocr_{i}.jpg"
-        with open(ocr_img_path, "wb") as f:
-            f.write(base64.b64decode(res["ocrImage"]))
-        layout_img_path = f"layout_{i}.jpg"
-        with open(layout_img_path, "wb") as f:
-            f.write(base64.b64decode(res["layoutImage"]))
-        print(f"Output images saved at {ocr_img_path} and {layout_img_path}")
-        print("")
-    print("="*50 + "\n\n")
+for i, res in enumerate(result_vision["visionResults"]):
+    print("Texts:")
+    pprint.pp(res["texts"])
+    print("Tables:")
+    pprint.pp(res["tables"])
+    ocr_img_path = f"ocr_{i}.jpg"
+    with open(ocr_img_path, "wb") as f:
+        f.write(base64.b64decode(res["ocrImage"]))
+    layout_img_path = f"layout_{i}.jpg"
+    with open(layout_img_path, "wb") as f:
+        f.write(base64.b64decode(res["layoutImage"]))
+    print(f"Output images saved at {ocr_img_path} and {layout_img_path}")
 
-    payload = {
-        "visionInfo": result_vision["visionInfo"],
-        "minChars": 200,
-        "llmRequestInterval": 1000,
-        "llmName": LLM_NAME,
-        "llmParams": LLM_PARAMS,
-    }
-    resp_vector = requests.post(url=f"{API_BASE_URL}/chatocr-vector", json=payload)
-    if resp_vector.status_code != 200:
-        print(
-            f"Request to chatocr-vector failed with status code {resp_vector.status_code}."
-        )
-        pprint.pp(resp_vector.json())
-        sys.exit(1)
-    result_vector = resp_vector.json()["result"]
-    print("="*50 + "\n\n")
+payload = {
+    "visionInfo": result_vision["visionInfo"],
+    "minChars": 200,
+    "llmRequestInterval": 1000,
+    "llmName": LLM_NAME,
+    "llmParams": LLM_PARAMS,
+}
+resp_vector = requests.post(url=f"{API_BASE_URL}/chatocr-vector", json=payload)
+if resp_vector.status_code != 200:
+    print(
+        f"Request to chatocr-vector failed with status code {resp_vector.status_code}."
+    )
+    pprint.pp(resp_vector.json())
+    sys.exit(1)
+result_vector = resp_vector.json()["result"]
 
-    payload = {
-        "keys": keys,
-        "vectorStore": result_vector["vectorStore"],
-        "visionInfo": result_vision["visionInfo"],
-        "llmName": LLM_NAME,
-        "llmParams": LLM_PARAMS,
-    }
-    resp_retrieval = requests.post(url=f"{API_BASE_URL}/chatocr-retrieval", json=payload)
-    if resp_retrieval.status_code != 200:
-        print(
-            f"Request to chatocr-retrieval failed with status code {resp_retrieval.status_code}."
-        )
-        pprint.pp(resp_retrieval.json())
-        sys.exit(1)
-    result_retrieval = resp_retrieval.json()["result"]
-    print("Knowledge retrieval result:")
-    print(result_retrieval["retrievalResult"])
-    print("="*50 + "\n\n")
+payload = {
+    "keys": keys,
+    "vectorStore": result_vector["vectorStore"],
+    "llmName": LLM_NAME,
+    "llmParams": LLM_PARAMS,
+}
+resp_retrieval = requests.post(url=f"{API_BASE_URL}/chatocr-retrieval", json=payload)
+if resp_retrieval.status_code != 200:
+    print(
+        f"Request to chatocr-retrieval failed with status code {resp_retrieval.status_code}."
+    )
+    pprint.pp(resp_retrieval.json())
+    sys.exit(1)
+result_retrieval = resp_retrieval.json()["result"]
 
-    payload = {
-        "keys": keys,
-        "visionInfo": result_vision["visionInfo"],
-        "taskDescription": "",
-        "rules": "",
-        "fewShot": "",
-        "useVectorStore": True,
-        "vectorStore": result_vector["vectorStore"],
-        "retrievalResult": result_retrieval["retrievalResult"],
-        "returnPrompts": True,
-        "llmName": LLM_NAME,
-        "llmParams": LLM_PARAMS,
-    }
-    resp_chat = requests.post(url=f"{API_BASE_URL}/chatocr-chat", json=payload)
-    if resp_chat.status_code != 200:
-        print(
-            f"Request to chatocr-chat failed with status code {resp_chat.status_code}."
-        )
-        pprint.pp(resp_chat.json())
-        sys.exit(1)
-    result_chat = resp_chat.json()["result"]
-    print("Prompts:")
-    pprint.pp(result_chat["prompts"])
-    print("Final result:")
-    print(len(result_chat["chatResult"]))
+payload = {
+    "keys": keys,
+    "visionInfo": result_vision["visionInfo"],
+    "taskDescription": "",
+    "rules": "",
+    "fewShot": "",
+    "vectorStore": result_vector["vectorStore"],
+    "retrievalResult": result_retrieval["retrievalResult"],
+    "returnPrompts": True,
+    "llmName": LLM_NAME,
+    "llmParams": LLM_PARAMS,
+}
+resp_chat = requests.post(url=f"{API_BASE_URL}/chatocr-chat", json=payload)
+if resp_chat.status_code != 200:
+    print(
+        f"Request to chatocr-chat failed with status code {resp_chat.status_code}."
+    )
+    pprint.pp(resp_chat.json())
+    sys.exit(1)
+result_chat = resp_chat.json()["result"]
+print("\nPrompts:")
+pprint.pp(result_chat["prompts"])
+print("Final result:")
+print(result_chat["chatResult"])
 ```
-</details>  
+
+**注**：请在 `API_KEY`、`SECRET_KEY` 处填入您的 API key 和 secret key。
+
+</details>
 </details>
 <br/>
 
@@ -588,7 +657,7 @@ if __name__ == "__main__":
 如果通用文档场景信息抽取v3产线提供的默认模型权重在您的场景中，精度或速度不满意，您可以尝试利用**您自己拥有的特定领域或应用场景的数据**对现有模型进行进一步的**微调**，以提升通用表格识别产线的在您的场景中的识别效果。
 
 ### 4.1 模型微调
-由于通用文档场景信息抽取v3产线包含四个模块，模型产线的效果不及预期可能来自于其中任何一个模块（文本图像矫正模块暂不支持二次开发）。
+由于通用文档场景信息抽取v3产线包含六个模块，模型产线的效果不及预期可能来自于其中任何一个模块（文本图像矫正模块暂不支持二次开发）。
 
 您可以对识别效果差的图片进行分析，参考如下规则进行分析和模型微调：
 
@@ -597,7 +666,7 @@ if __name__ == "__main__":
 * 有较多的文本未被检测出来（即文本漏检现象），那么可能是文本检测模型存在不足，您需要参考[文本检测模块开发教程](../../../module_usage/tutorials/ocr_modules/text_detection.md)中的**二次开发**章节，使用您的私有数据集对文本检测模型进行微调。
 * 已检测到的文本中出现较多的识别错误（即识别出的文本内容与实际文本内容不符），这表明文本识别模型需要进一步改进，您需要参考[文本识别模块开发教程](../../../module_usage/tutorials/ocr_modules/text_recognition.md)中的**二次开发**章节对文本识别模型进行微调。
 * 已检测到的印章文本出现较多的识别错误，这表明印章文本检测模块模型需要进一步改进，您需要参考[印章文本检测模块开发教程](../../../module_usage/tutorials/ocr_modules/)中的**二次开发**章节对印章文本检测模型进行微调。
-* 含文字区域的文档或证件的方向存在较多的识别错误，这表明文档图像方向分类模型需要进一步改进，您需要参考[文档图像方向分类模块开发教程](https://ku.baidu-int.com/knowledge/HFVrC7hq1Q/yKeL8Lljko/y0mmii50BW/J5-rNhRB_xfhDZ?t=mention&mt=doc&dt=doc)中的**二次开发**章节对文档图像方向分类模型进行微调。
+* 含文字区域的文档或证件的方向存在较多的识别错误，这表明文档图像方向分类模型需要进一步改进，您需要参考[文档图像方向分类模块开发教程](../../../module_usage/tutorials/ocr_modules/doc_img_orientation_classification.md)中的**二次开发**章节对文档图像方向分类模型进行微调。
 
 ### 4.2 模型应用
 当您使用私有数据集完成微调训练后，可获得本地模型权重文件。
@@ -620,24 +689,17 @@ Pipeline:
 随后， 参考本地体验中的命令行方式或 Python 脚本方式，加载修改后的产线配置文件即可。
 
 ##  5. 多硬件支持
-PaddleX 支持英伟达 GPU、昆仑芯 XPU、昇腾 NPU和寒武纪 MLU 等多种主流硬件设备，**仅需设置 `--device` 参数**即可完成不同硬件之间的无缝切换。
+PaddleX 支持英伟达 GPU、昆仑芯 XPU、昇腾 NPU 和寒武纪 MLU 等多种主流硬件设备，**仅需设置 `device` 参数**即可完成不同硬件之间的无缝切换。
 
-例如，您使用英伟达 GPU 进行文档场景信息抽取v3产线的推理，使用的 Python 脚本为：
-
-```python
-from paddlex import create_pipeline
-predict = create_pipeline( pipeline="PP-ChatOCRv3-doc",
-                            llm_name="ernie-3.5",
-                            llm_params = {"api_type":"qianfan","ak":"","sk":""},  ## 请填入您的ak与sk，否则无法调用大模型
-                            device = "gpu:0" ) 
-```
-此时，若您想将硬件切换为昇腾 NPU，仅需对脚本中的 `--device` 修改为 npu 即可：
+例如，使用文档场景信息抽取v3产线时，将运行设备从英伟达 GPU 更改为昇腾 NPU，仅需将脚本中的 `device` 修改为 npu 即可：
 
 ```python
 from paddlex import create_pipeline
-predict = create_pipeline( pipeline="PP-ChatOCRv3-doc",
-                            llm_name="ernie-3.5",
-                            llm_params = {"api_type":"qianfan","ak":"","sk":""},  ## 请填入您的ak与sk，否则无法调用大模型
-                            device = "npu:0" ) 
+pipeline = create_pipeline(
+    pipeline="PP-ChatOCRv3-doc",
+    llm_name="ernie-3.5",
+    llm_params={"api_type": "qianfan", "ak": "", "sk": ""},
+    device="npu:0" # gpu:0 --> npu:0
+    )
 ```
-若您想在更多种类的硬件上使用通用文档场景信息抽取产线，请参考[PaddleX多硬件使用指南](../../../other_devices_support/installation_other_devices.md)。
+若您想在更多种类的硬件上使用通用文档场景信息抽取产线，请参考[PaddleX多硬件使用指南](../../../other_devices_support/multi_devices_use_guide.md)。

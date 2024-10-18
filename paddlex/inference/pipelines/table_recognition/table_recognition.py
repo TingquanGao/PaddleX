@@ -21,54 +21,32 @@ from ...components import CropByBoxes
 from ...results import OCRResult, TableResult, StructureTableResult
 
 
-class TableRecPipeline(BasePipeline):
+class _TableRecPipeline(BasePipeline):
     """Table Recognition Pipeline"""
 
-    entities = "table_recognition"
-
     def __init__(
+        self,
+        device,
+        predictor_kwargs,
+    ):
+        super().__init__(device, predictor_kwargs)
+
+    def _build_predictor(
         self,
         layout_model,
         text_det_model,
         text_rec_model,
         table_model,
-        layout_batch_size=1,
-        text_det_batch_size=1,
-        text_rec_batch_size=1,
-        table_batch_size=1,
-        predictor_kwargs=None,
     ):
-        self.layout_model = layout_model
-        self.text_det_model = text_det_model
-        self.text_rec_model = text_rec_model
-        self.table_model = table_model
-        self.layout_batch_size = layout_batch_size
-        self.text_det_batch_size = text_det_batch_size
-        self.text_rec_batch_size = text_rec_batch_size
-        self.table_batch_size = table_batch_size
-        self.predictor_kwargs = predictor_kwargs
-        super().__init__(predictor_kwargs=predictor_kwargs)
-        self._build_predictor()
-
-    def _build_predictor(
-        self,
-    ):
-        self.layout_predictor = self._create_model(model=self.layout_model)
-        self.ocr_pipeline = OCRPipeline(
-            text_det_model=self.text_det_model,
-            text_rec_model=self.text_rec_model,
-            text_det_batch_size=self.text_det_batch_size,
-            text_rec_batch_size=self.text_rec_batch_size,
-            predictor_kwargs=self.predictor_kwargs,
+        self.layout_predictor = self._create(model=layout_model)
+        self.ocr_pipeline = self._create(
+            pipeline=OCRPipeline,
+            text_det_model=text_det_model,
+            text_rec_model=text_rec_model,
         )
-        self.table_predictor = self._create_model(model=self.table_model)
+        self.table_predictor = self._create(model=table_model)
         self._crop_by_boxes = CropByBoxes()
         self._match = TableMatch(filter_ocr_result=False)
-        self.layout_predictor.set_predictor(batch_size=self.layout_batch_size)
-        self.ocr_pipeline.text_rec_model.set_predictor(
-            batch_size=self.text_rec_batch_size
-        )
-        self.table_predictor.set_predictor(batch_size=self.table_batch_size)
 
     def set_predictor(
         self,
@@ -76,6 +54,7 @@ class TableRecPipeline(BasePipeline):
         text_det_batch_size=None,
         text_rec_batch_size=None,
         table_batch_size=None,
+        device=None,
     ):
         if text_det_batch_size and text_det_batch_size > 1:
             logging.warning(
@@ -89,38 +68,13 @@ class TableRecPipeline(BasePipeline):
             )
         if table_batch_size:
             self.table_predictor.set_predictor(batch_size=table_batch_size)
+        if device:
+            self.layout_predictor.set_predictor(device=device)
+            self.ocr_pipeline.text_rec_model.set_predictor(device=device)
+            self.table_predictor.set_predictor(device=device)
 
-    def predict(self, x):
-        for layout_pred, ocr_pred in zip(
-            self.layout_predictor(x), self.ocr_pipeline(x)
-        ):
-            single_img_res = {
-                "input_path": "",
-                "layout_result": {},
-                "ocr_result": {},
-                "table_result": [],
-            }
-            # update layout result
-            single_img_res["input_path"] = layout_pred["input_path"]
-            single_img_res["layout_result"] = layout_pred
-            subs_of_img = list(self._crop_by_boxes(layout_pred))
-            # get cropped images with label "table"
-            table_subs = []
-            for sub in subs_of_img:
-                box = sub["box"]
-                if sub["label"].lower() == "table":
-                    table_subs.append(sub)
-                    _, ocr_res = self.get_related_ocr_result(box, ocr_pred)
-            table_res, all_table_ocr_res = self.get_table_result(table_subs)
-            for table_ocr_res in all_table_ocr_res:
-                ocr_res["dt_polys"].extend(table_ocr_res["dt_polys"])
-                ocr_res["rec_text"].extend(table_ocr_res["rec_text"])
-                ocr_res["rec_score"].extend(table_ocr_res["rec_score"])
-
-            single_img_res["table_result"] = table_res
-            single_img_res["ocr_result"] = OCRResult(ocr_res)
-
-            yield TableResult(single_img_res)
+    def predict(self, inputs):
+        raise NotImplementedError("The method `predict` has not been implemented yet.")
 
     def get_related_ocr_result(self, box, ocr_res):
         dt_polys_list = []
@@ -174,3 +128,66 @@ class TableRecPipeline(BasePipeline):
             ocr_res_list.append(ocr_pred)
             table_index += 1
         return table_res_list, ocr_res_list
+
+
+class TableRecPipeline(_TableRecPipeline):
+    """Table Recognition Pipeline"""
+
+    entities = "table_recognition"
+
+    def __init__(
+        self,
+        layout_model,
+        text_det_model,
+        text_rec_model,
+        table_model,
+        layout_batch_size=1,
+        text_det_batch_size=1,
+        text_rec_batch_size=1,
+        table_batch_size=1,
+        device=None,
+        predictor_kwargs=None,
+    ):
+        super().__init__(device, predictor_kwargs)
+        self._build_predictor(layout_model, text_det_model, text_rec_model, table_model)
+        self.set_predictor(
+            layout_batch_size=layout_batch_size,
+            text_det_batch_size=text_det_batch_size,
+            text_rec_batch_size=text_rec_batch_size,
+            table_batch_size=table_batch_size,
+        )
+
+    def predict(self, input, **kwargs):
+        self.set_predictor(**kwargs)
+        for layout_pred, ocr_pred in zip(
+            self.layout_predictor(input), self.ocr_pipeline(input)
+        ):
+            single_img_res = {
+                "input_path": "",
+                "layout_result": {},
+                "ocr_result": {},
+                "table_result": [],
+            }
+            # update layout result
+            single_img_res["input_path"] = layout_pred["input_path"]
+            single_img_res["layout_result"] = layout_pred
+            ocr_res = ocr_pred
+            table_subs = []
+            if len(layout_pred["boxes"]) > 0:
+                subs_of_img = list(self._crop_by_boxes(layout_pred))
+                # get cropped images with label "table"
+                for sub in subs_of_img:
+                    box = sub["box"]
+                    if sub["label"].lower() == "table":
+                        table_subs.append(sub)
+                        _, ocr_res = self.get_related_ocr_result(box, ocr_res)
+            table_res, all_table_ocr_res = self.get_table_result(table_subs)
+            for table_ocr_res in all_table_ocr_res:
+                ocr_res["dt_polys"].extend(table_ocr_res["dt_polys"])
+                ocr_res["rec_text"].extend(table_ocr_res["rec_text"])
+                ocr_res["rec_score"].extend(table_ocr_res["rec_score"])
+
+            single_img_res["table_result"] = table_res
+            single_img_res["ocr_result"] = OCRResult(ocr_res)
+
+            yield TableResult(single_img_res)

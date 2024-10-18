@@ -13,22 +13,18 @@
 # limitations under the License.
 
 from abc import abstractmethod
+import inspect
 
 from ....utils.subclass_register import AutoRegisterABCMetaClass
-from ....utils.func_register import FuncRegister
 from ....utils import logging
 from ...components.base import BaseComponent, ComponentsEngine
 from ...utils.pp_option import PaddlePredictorOption
 from ...utils.process_hook import generatorable_method
-from ..utils.predict_set import DeviceSetMixin, PPOptionSetMixin, BatchSizeSetMixin
 from .base_predictor import BasePredictor
 
 
 class BasicPredictor(
     BasePredictor,
-    DeviceSetMixin,
-    PPOptionSetMixin,
-    BatchSizeSetMixin,
     metaclass=AutoRegisterABCMetaClass,
 ):
 
@@ -36,26 +32,20 @@ class BasicPredictor(
 
     def __init__(self, model_dir, config=None, device=None, pp_option=None):
         super().__init__(model_dir=model_dir, config=config)
-        self._pred_set_func_map = {}
-        self._pred_set_register = FuncRegister(self._pred_set_func_map)
-        self._pred_set_register("device")(self.set_device)
-        self._pred_set_register("pp_option")(self.set_pp_option)
-        self._pred_set_register("batch_size")(self.set_batch_size)
+        if not pp_option:
+            pp_option = PaddlePredictorOption(model_name=self.model_name)
+        if device:
+            pp_option.device = device
+        self.pp_option = pp_option
 
-        self.pp_option = (
-            pp_option
-            if pp_option
-            else PaddlePredictorOption(model_name=self.model_name)
-        )
-        self.pp_option.set_device(device)
         self.components = {}
         self._build_components()
         self.engine = ComponentsEngine(self.components)
         logging.debug(f"{self.__class__.__name__}: {self.model_dir}")
 
-    def apply(self, x):
+    def apply(self, input):
         """predict"""
-        yield from self._generate_res(self.engine(x))
+        yield from self._generate_res(self.engine(input))
 
     @generatorable_method
     def _generate_res(self, batch_data):
@@ -79,12 +69,19 @@ class BasicPredictor(
             ), f"The key ({key}) has been used: {self.components}!"
             self.components[key] = cmp
 
-    def set_predictor(self, **kwargs):
-        for k in kwargs:
-            assert (
-                k in self._pred_set_func_map
-            ), f"The arg({k}) is not supported to specify in predict() func! Only supports: {self._pred_set_func_map.keys()}"
-            self._pred_set_func_map[k](kwargs[k])
+    def set_predictor(self, batch_size=None, device=None, pp_option=None):
+        if batch_size:
+            self.components["ReadCmp"].batch_size = batch_size
+        if device and device != self.pp_option.device:
+            self.pp_option.device = device
+            self.components["PPEngineCmp"].reset()
+        if pp_option and pp_option != self.pp_option:
+            self.pp_option = pp_option
+            self.components["PPEngineCmp"].reset()
+
+    def _has_setter(self, attr):
+        prop = getattr(self.__class__, attr, None)
+        return isinstance(prop, property) and prop.fset is not None
 
     @abstractmethod
     def _build_components(self):

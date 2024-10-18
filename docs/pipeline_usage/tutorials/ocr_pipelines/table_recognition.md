@@ -21,7 +21,7 @@
     <th>模型</th>
     <th>精度（%）</th>
     <th>GPU推理耗时 (ms)</th>
-    <th>CPU推理耗时</th>
+    <th>CPU推理耗时（ms）</th>
     <th>模型存储大小 (M)</th>
     <th>介绍</th>
   </tr>
@@ -47,7 +47,7 @@
 
 **版面区域分析模块模型：**
 
-|模型名称|mAP（%）|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
+|模型名称|mAP（%）|GPU推理耗时（ms）|CPU推理耗时（ms）|模型存储大小（M)|
 |-|-|-|-|-|
 |PicoDet_layout_1x|86.8|13.036|91.2634|7.4M |
 |PicoDet-L_layout_3cls|89.3|15.7425|159.771|22.6 M|
@@ -58,7 +58,7 @@
 
 **文本检测模块模型：**
 
-|模型名称|检测Hmean（%）|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
+|模型名称|检测Hmean（%）|GPU推理耗时（ms）|CPU推理耗时（ms）|模型存储大小（M)|
 |-|-|-|-|-|
 |PP-OCRv4_mobile_det |77.79|10.6923|120.177|4.2 M|
 |PP-OCRv4_server_det |82.69|83.3501|2434.01|100.1M|
@@ -67,7 +67,7 @@
 
 **文本识别模块模型：**
 
-|模型名称|识别Avg Accuracy(%)|GPU推理耗时（ms）|CPU推理耗时|模型存储大小（M)|
+|模型名称|识别Avg Accuracy(%)|GPU推理耗时（ms）|CPU推理耗时（ms）|模型存储大小（M)|
 |-|-|-|-|-|
 |PP-OCRv4_mobile_rec |78.20|7.95018|46.7868|10.6 M|
 |PP-OCRv4_server_rec |79.20|7.19439|140.179|71.2 M|
@@ -90,9 +90,9 @@ PaddleX 所提供的预训练的模型产线均可以快速体验效果，你可
 在本地使用通用表格识别产线前，请确保您已经按照[PaddleX本地安装教程](../../../installation/installation.md)完成了PaddleX的wheel包安装。
 
 ### 2.1 命令行方式体验
-一行命令即可快速体验表格识别产线效果，使用 [测试文件](ttps://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/table_recognition.jpg)，并将 `--input` 替换为本地路径，进行预测
+一行命令即可快速体验表格识别产线效果，使用 [测试文件](https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/table_recognition.jpg)，并将 `--input` 替换为本地路径，进行预测
 
-```
+```bash
 paddlex --pipeline table_recognition --input table_recognition.jpg --device gpu:0
 ```
 参数说明：
@@ -114,13 +114,13 @@ paddlex --get_pipeline_config table_recognition
 执行后，表格识别产线配置文件将被保存在当前路径。若您希望自定义保存位置，可执行如下命令（假设自定义保存位置为 `./my_path` ）：
 
 ```
-paddlex --get_pipeline_config table_recognition --config_save_path ./my_path
+paddlex --get_pipeline_config table_recognition --save_path ./my_path
 ```
 
 获取产线配置文件后，可将 `--pipeline` 替换为配置文件保存路径，即可使配置文件生效。例如，若配置文件保存路径为 `./table_recognition.yaml`，只需执行：
 
-```
-paddlex --pipeline ./table_recognition.yaml --input table_recognition.jpg
+```bash
+paddlex --pipeline ./table_recognition.yaml --input table_recognition.jpg --device gpu:0
 ```
 其中，`--model`、`--device` 等参数无需指定，将使用配置文件中的参数。若依然指定了参数，将以指定的参数为准。
 
@@ -132,7 +132,7 @@ paddlex --pipeline ./table_recognition.yaml --input table_recognition.jpg
    <summary> 👉点击展开</summary>
 
 ```
-{'input_path': '/root/.paddlex/predict_input/table_recognition.jpg', 'layout_result': {'input_path': '/root/.paddlex/predict_input/table_recognition.jpg', 'boxes': [{'cls_id': 3, 'label': 'Table', 'score': 0.6014542579650879, 'coordinate': [0, 21, 551, 118]}]}, 'ocr_result': {'dt_polys': [array([[37., 40.],
+{'input_path': 'table_recognition.jpg', 'layout_result': {'input_path': 'table_recognition.jpg', 'boxes': [{'cls_id': 3, 'label': 'Table', 'score': 0.6014542579650879, 'coordinate': [0, 21, 551, 118]}]}, 'ocr_result': {'dt_polys': [array([[37., 40.],
        [75., 40.],
        [75., 60.],
        [37., 60.]], dtype=float32), array([[123.,  37.],
@@ -165,7 +165,7 @@ paddlex --pipeline ./table_recognition.yaml --input table_recognition.jpg
        [278., 118.]], dtype=float32), array([[446., 102.],
        [504., 104.],
        [503., 118.],
-       [445., 118.]], dtype=float32)], 'rec_text': ['Dres', '连续工作3', '取出来放在网上，没想', '江、整江等八大', 'Abstr', 'rSrivi', '$709.', 'cludingGiv', '2.72', 'Ingcubic', '$744.78'], 'rec_score': [0.9934158325195312, 0.9990204572677612, 0.9967061877250671, 0.9375461935997009, 0.9947397112846375, 0.9972746968269348, 0.9904290437698364, 0.973427414894104, 0.9983080625534058, 0.993423342704773, 0.9964120984077454], 'input_path': '/root/.paddlex/predict_input/table_recognition.jpg'}, 'table_result': [{'input_path': '/root/.paddlex/predict_input/table_recognition.jpg', 'layout_bbox': [0, 21, 551, 118], 'bbox': array([[  4.395736 ,  25.238262 , 113.31014  ,  25.316246 , 115.454315 ,
+       [445., 118.]], dtype=float32)], 'rec_text': ['Dres', '连续工作3', '取出来放在网上，没想', '江、整江等八大', 'Abstr', 'rSrivi', '$709.', 'cludingGiv', '2.72', 'Ingcubic', '$744.78'], 'rec_score': [0.9934158325195312, 0.9990204572677612, 0.9967061877250671, 0.9375461935997009, 0.9947397112846375, 0.9972746968269348, 0.9904290437698364, 0.973427414894104, 0.9983080625534058, 0.993423342704773, 0.9964120984077454], 'input_path': 'table_recognition.jpg'}, 'table_result': [{'input_path': 'table_recognition.jpg', 'layout_bbox': [0, 21, 551, 118], 'bbox': array([[  4.395736 ,  25.238262 , 113.31014  ,  25.316246 , 115.454315 ,
          71.8867   ,   3.7177477,  71.7937   ],
        [110.727455 ,  25.94007  , 210.07187  ,  26.028755 , 209.66394  ,
          65.96484  , 109.59861  ,  66.09809  ],
@@ -194,7 +194,7 @@ paddlex --pipeline ./table_recognition.yaml --input table_recognition.jpg
 
 ![](https://raw.githubusercontent.com/cuicheng01/PaddleX_doc_images/main/images/pipelines/table_recognition/03.png)
 
-可视化图片默认保存在 `output` 目录下，您也可以通过 `--save_path` 进行自定义。
+可视化图片默认不进行保存，您可以通过 `--save_path` 自定义保存路径，随后所有结果将被保存在指定路径下。
 
 ### 2.2 Python脚本方式集成
 几行代码即可完成产线的快速推理，以通用表格识别产线为例：
@@ -207,8 +207,9 @@ pipeline = create_pipeline(pipeline="table_recognition")
 output = pipeline.predict("table_recognition.jpg")
 for res in output:
     res.print() ## 打印预测的结构化输出
-    res.save_to_csv("./output/") ## 保存csv格式结果
+    res.save_to_img("./output/") ## 保存img格式结果
     res.save_to_xlsx("./output/") ## 保存表格格式结果
+    res.save_to_html("./output/") ## 保存html结果
 ```
 得到的结果与命令行方式相同。
 
@@ -220,7 +221,7 @@ for res in output:
 |-|-|-|-|
 |`pipeline`|产线名称或是产线配置文件路径。如为产线名称，则必须为 PaddleX 所支持的产线。|`str`|无|
 |`device`|产线模型推理设备。支持：“gpu”，“cpu”。|`str`|`gpu`|
-|`enable_hpi`|是否启用高性能推理，仅当该产线支持高性能推理时可用。|`bool`|`False`|
+|`use_hpip`|是否启用高性能推理，仅当该产线支持高性能推理时可用。|`bool`|`False`|
 
 （2）调用产线对象的 `predict` 方法进行推理预测：`predict` 方法参数为`x`，用于输入待预测数据，支持多种输入方式，具体示例如下：
 
@@ -240,9 +241,11 @@ for res in output:
 
 |方法|说明|方法参数|
 |-|-|-|
-|save_to_csv|将结果保存为csv格式的文件|`- save_path`：str类型，保存的文件路径，当为目录时，保存文件命名与输入文件类型命名一致；|
+|save_to_img|将结果保存为img格式的文件|`- save_path`：str类型，保存的文件路径，当为目录时，保存文件命名与输入文件类型命名一致；|
 |save_to_html|将结果保存为html格式的文件|`- save_path`：str类型，保存的文件路径，当为目录时，保存文件命名与输入文件类型命名一致；|
 |save_to_xlsx|将结果保存为表格格式的文件|`- save_path`：str类型，保存的文件路径，当为目录时，保存文件命名与输入文件类型命名一致；|
+
+其中，`save_to_img` 能够保存可视化结果（包括OCR结果图片、版面分析结果图片、表格结构识别结果图片）， `save_to_html` 能够将表格直接保存为html文件（包括文本和表格格式），`save_to_xlsx` 能够将表格保存为Excel格式文件（包括文本和格式）。
 
 若您获取了配置文件，即可对表格识别产线各项配置进行自定义，只需要修改 `create_pipeline` 方法中的 `pipeline` 参数值为产线配置文件路径即可。
 
@@ -254,25 +257,26 @@ pipeline = create_pipeline(pipeline="./my_path/table_recognition.yaml")
 output = pipeline.predict("table_recognition.jpg")
 for res in output:
     res.print() ## 打印预测的结构化输出
-    res.save_to_csv("./output/") ## 保存csv格式结果
+    res.save_to_img("./output/") ## 保存img格式结果
     res.save_to_xlsx("./output/") ## 保存表格格式结果
+    res.save_to_html("./output/") ## 保存html结果
 ```
 ## 3. 开发集成/部署
 如果产线可以达到您对产线推理速度和精度的要求，您可以直接进行开发集成/部署。
 
-若您需要将产线直接应用在您的Python项目中，可以参考 [2.2.2 Python脚本方式](#222-python脚本方式集成)中的示例代码。
+若您需要将产线直接应用在您的Python项目中，可以参考 [2.2 Python脚本方式](#22-python脚本方式集成)中的示例代码。
 
 此外，PaddleX 也提供了其他三种部署方式，详细说明如下：
 
-🚀 **高性能部署**：在实际生产环境中，许多应用对部署策略的性能指标（尤其是响应速度）有着较严苛的标准，以确保系统的高效运行与用户体验的流畅性。为此，PaddleX 提供高性能推理插件，旨在对模型推理及前后处理进行深度性能优化，实现端到端流程的显著提速，详细的高性能部署流程请参考[PaddleX高性能部署指南](../../../pipeline_deploy/high_performance_deploy.md)。
+🚀 **高性能推理**：在实际生产环境中，许多应用对部署策略的性能指标（尤其是响应速度）有着较严苛的标准，以确保系统的高效运行与用户体验的流畅性。为此，PaddleX 提供高性能推理插件，旨在对模型推理及前后处理进行深度性能优化，实现端到端流程的显著提速，详细的高性能推理流程请参考[PaddleX高性能推理指南](../../../pipeline_deploy/high_performance_inference.md)。
 
 ☁️ **服务化部署**：服务化部署是实际生产环境中常见的一种部署形式。通过将推理功能封装为服务，客户端可以通过网络请求来访问这些服务，以获取推理结果。PaddleX 支持用户以低成本实现产线的服务化部署，详细的服务化部署流程请参考[PaddleX服务化部署指南](../../../pipeline_deploy/service_deploy.md)。
 
 下面是API参考和多语言服务调用示例：
 
-<details>  
-<summary>API参考</summary>  
-  
+<details>
+<summary>API参考</summary>
+
 对于服务提供的所有操作：
 
 - 响应体以及POST请求的请求体均为JSON数据（JSON对象）。
@@ -331,11 +335,11 @@ for res in output:
 </details>
 
 <details>
-<summary>多语言调用服务示例</summary>  
+<summary>多语言调用服务示例</summary>
 
-<details>  
-<summary>Python</summary>  
-  
+<details>
+<summary>Python</summary>
+
 ```python
 import base64
 import requests
@@ -343,7 +347,7 @@ import requests
 API_URL = "http://localhost:8080/table-recognition" # 服务URL
 image_path = "./demo.jpg"
 ocr_image_path = "./ocr.jpg"
-layout_image_path = "./table.jpg"
+layout_image_path = "./layout.jpg"
 
 # 对本地图像进行Base64编码
 with open(image_path, "rb") as file:
@@ -367,12 +371,12 @@ print(f"Output image saved at {layout_image_path}")
 print("\nDetected tables:")
 print(result["tables"])
 ```
-  
+
 </details>
 
-<details>  
-<summary>C++</summary>  
-  
+<details>
+<summary>C++</summary>
+
 ```cpp
 #include <iostream>
 #include "cpp-httplib/httplib.h" // https://github.com/Huiyicc/cpp-httplib
@@ -383,7 +387,7 @@ int main() {
     httplib::Client client("localhost:8080");
     const std::string imagePath = "./demo.jpg";
     const std::string ocrImagePath = "./ocr.jpg";
-    const std::string layoutImagePath = "./table.jpg";
+    const std::string layoutImagePath = "./layout.jpg";
 
     httplib::Headers headers = {
         {"Content-Type", "application/json"}
@@ -427,11 +431,11 @@ int main() {
 
         encodedImage = result["layoutImage"];
         decodedString = base64::from_base64(encodedImage);
-        std::vector<unsigned char> decodedTableImage(decodedString.begin(), decodedString.end());
-        std::ofstream outputTableFile(layoutImagePath, std::ios::binary | std::ios::out);
-        if (outputTableFile.is_open()) {
-            outputTableFile.write(reinterpret_cast<char*>(decodedTableImage.data()), decodedTableImage.size());
-            outputTableFile.close();
+        std::vector<unsigned char> decodedLayoutImage(decodedString.begin(), decodedString.end());
+        std::ofstream outputLayoutFile(layoutImagePath, std::ios::binary | std::ios::out);
+        if (outputLayoutFile.is_open()) {
+            outputLayoutFile.write(reinterpret_cast<char*>(decodedLayoutImage.data()), decodedLayoutImage.size());
+            outputLayoutFile.close();
             std::cout << "Output image saved at " << layoutImagePath << std::endl;
         } else {
             std::cerr << "Unable to open file for writing: " << layoutImagePath << std::endl;
@@ -439,8 +443,8 @@ int main() {
 
         auto tables = result["tables"];
         std::cout << "\nDetected tables:" << std::endl;
-        for (const auto& category : tables) {
-            std::cout << category << std::endl;
+        for (const auto& table : tables) {
+            std::cout << table << std::endl;
         }
     } else {
         std::cout << "Failed to send HTTP request." << std::endl;
@@ -450,12 +454,12 @@ int main() {
     return 0;
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Java</summary>  
-  
+<details>
+<summary>Java</summary>
+
 ```java
 import okhttp3.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -472,7 +476,7 @@ public class Main {
         String API_URL = "http://localhost:8080/table-recognition"; // 服务URL
         String imagePath = "./demo.jpg"; // 本地图像
         String ocrImagePath = "./ocr.jpg";
-        String layoutImagePath = "./table.jpg";
+        String layoutImagePath = "./layout.jpg";
 
         // 对本地图像进行Base64编码
         File file = new File(imagePath);
@@ -522,116 +526,116 @@ public class Main {
     }
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Go</summary>  
-  
+<details>
+<summary>Go</summary>
+
 ```go
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+    "bytes"
+    "encoding/base64"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
 )
 
 func main() {
-	API_URL := "http://localhost:8080/table-recognition"
-	imagePath := "./demo.jpg"
-	ocrImagePath := "./ocr.jpg"
-	layoutImagePath := "./table.jpg"
+    API_URL := "http://localhost:8080/table-recognition"
+    imagePath := "./demo.jpg"
+    ocrImagePath := "./ocr.jpg"
+    layoutImagePath := "./layout.jpg"
 
-	// 对本地图像进行Base64编码
-	imageBytes, err := ioutil.ReadFile(imagePath)
-	if err != nil {
-		fmt.Println("Error reading image file:", err)
-		return
-	}
-	imageData := base64.StdEncoding.EncodeToString(imageBytes)
+    // 对本地图像进行Base64编码
+    imageBytes, err := ioutil.ReadFile(imagePath)
+    if err != nil {
+        fmt.Println("Error reading image file:", err)
+        return
+    }
+    imageData := base64.StdEncoding.EncodeToString(imageBytes)
 
-	payload := map[string]string{"image": imageData} // Base64编码的文件内容或者图像URL
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		fmt.Println("Error marshaling payload:", err)
-		return
-	}
+    payload := map[string]string{"image": imageData} // Base64编码的文件内容或者图像URL
+    payloadBytes, err := json.Marshal(payload)
+    if err != nil {
+        fmt.Println("Error marshaling payload:", err)
+        return
+    }
 
-	// 调用API
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", API_URL, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return
-	}
+    // 调用API
+    client := &http.Client{}
+    req, err := http.NewRequest("POST", API_URL, bytes.NewBuffer(payloadBytes))
+    if err != nil {
+        fmt.Println("Error creating request:", err)
+        return
+    }
 
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error sending request:", err)
-		return
-	}
-	defer res.Body.Close()
+    res, err := client.Do(req)
+    if err != nil {
+        fmt.Println("Error sending request:", err)
+        return
+    }
+    defer res.Body.Close()
 
     // 处理接口返回数据
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return
-	}
-	type Response struct {
-		Result struct {
-			OcrImage      string   `json:"ocrImage"`
-            TableImage      string   `json:"layoutImage"`
-			Tables []map[string]interface{} `json:"tables"`
-		} `json:"result"`
-	}
-	var respData Response
-	err = json.Unmarshal([]byte(string(body)), &respData)
-	if err != nil {
-		fmt.Println("Error unmarshaling response body:", err)
-		return
-	}
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Println("Error reading response body:", err)
+        return
+    }
+    type Response struct {
+        Result struct {
+            OcrImage      string   `json:"ocrImage"`
+            LayoutImage      string   `json:"layoutImage"`
+            Tables []map[string]interface{} `json:"tables"`
+        } `json:"result"`
+    }
+    var respData Response
+    err = json.Unmarshal([]byte(string(body)), &respData)
+    if err != nil {
+        fmt.Println("Error unmarshaling response body:", err)
+        return
+    }
 
-	ocrImageData, err := base64.StdEncoding.DecodeString(respData.Result.OcrImage)
-	if err != nil {
-		fmt.Println("Error decoding base64 image data:", err)
-		return
-	}
-	err = ioutil.WriteFile(ocrImagePath, ocrImageData, 0644)
-	if err != nil {
-		fmt.Println("Error writing image to file:", err)
-		return
-	}
+    ocrImageData, err := base64.StdEncoding.DecodeString(respData.Result.OcrImage)
+    if err != nil {
+        fmt.Println("Error decoding base64 image data:", err)
+        return
+    }
+    err = ioutil.WriteFile(ocrImagePath, ocrImageData, 0644)
+    if err != nil {
+        fmt.Println("Error writing image to file:", err)
+        return
+    }
     fmt.Printf("Image saved at %s.jpg\n", ocrImagePath)
 
-    layoutImageData, err := base64.StdEncoding.DecodeString(respData.Result.TableImage)
-	if err != nil {
-		fmt.Println("Error decoding base64 image data:", err)
-		return
-	}
-	err = ioutil.WriteFile(layoutImagePath, layoutImageData, 0644)
-	if err != nil {
-		fmt.Println("Error writing image to file:", err)
-		return
-	}
+    layoutImageData, err := base64.StdEncoding.DecodeString(respData.Result.LayoutImage)
+    if err != nil {
+        fmt.Println("Error decoding base64 image data:", err)
+        return
+    }
+    err = ioutil.WriteFile(layoutImagePath, layoutImageData, 0644)
+    if err != nil {
+        fmt.Println("Error writing image to file:", err)
+        return
+    }
     fmt.Printf("Image saved at %s.jpg\n", layoutImagePath)
 
-	fmt.Println("\nDetected tables:")
-	for _, category := range respData.Result.Tables {
-		fmt.Println(category)
-	}
+    fmt.Println("\nDetected tables:")
+    for _, table := range respData.Result.Tables {
+        fmt.Println(table)
+    }
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>C#</summary>  
-  
+<details>
+<summary>C#</summary>
+
 ```csharp
 using System;
 using System.IO;
@@ -646,7 +650,7 @@ class Program
     static readonly string API_URL = "http://localhost:8080/table-recognition";
     static readonly string imagePath = "./demo.jpg";
     static readonly string ocrImagePath = "./ocr.jpg";
-    static readonly string layoutImagePath = "./table.jpg";
+    static readonly string layoutImagePath = "./layout.jpg";
 
     static async Task Main(string[] args)
     {
@@ -682,12 +686,12 @@ class Program
     }
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Node.js</summary>  
-  
+<details>
+<summary>Node.js</summary>
+
 ```js
 const axios = require('axios');
 const fs = require('fs');
@@ -695,7 +699,7 @@ const fs = require('fs');
 const API_URL = 'http://localhost:8080/table-recognition'
 const imagePath = './demo.jpg'
 const ocrImagePath = "./ocr.jpg";
-const layoutImagePath = "./table.jpg";
+const layoutImagePath = "./layout.jpg";
 
 let config = {
    method: 'POST',
@@ -737,19 +741,19 @@ axios.request(config)
   console.log(error);
 });
 ```
-  
+
 </details>
 
-<details>  
-<summary>PHP</summary>  
-  
+<details>
+<summary>PHP</summary>
+
 ```php
 <?php
 
 $API_URL = "http://localhost:8080/table-recognition"; // 服务URL
 $image_path = "./demo.jpg";
 $ocr_image_path = "./ocr.jpg";
-$layout_image_path = "./table.jpg";
+$layout_image_path = "./layout.jpg";
 
 // 对本地图像进行Base64编码
 $image_data = base64_encode(file_get_contents($image_path));
@@ -776,7 +780,7 @@ print_r($result["tables"]);
 
 ?>
 ```
-  
+
 </details>
 </details>
 <br/>
@@ -822,12 +826,12 @@ PaddleX 支持英伟达 GPU、昆仑芯 XPU、昇腾 NPU和寒武纪 MLU 等多�
 
 例如，您使用英伟达 GPU 进行表格识别产线的推理，使用的 Python 命令为：
 
-```
+```bash
 paddlex --pipeline table_recognition --input table_recognition.jpg --device gpu:0
 ```
 此时，若您想将硬件切换为昇腾 NPU，仅需对 Python 命令中的 `--device` 修改为npu 即可：
 
-```
+```bash
 paddlex --pipeline table_recognition --input table_recognition.jpg --device npu:0
 ```
-若您想在更多种类的硬件上使用通用表格识别产线，请参考[PaddleX多硬件使用指南](../../../other_devices_support/installation_other_devices.md)。
+若您想在更多种类的硬件上使用通用表格识别产线，请参考[PaddleX多硬件使用指南](../../../other_devices_support/multi_devices_use_guide.md)。

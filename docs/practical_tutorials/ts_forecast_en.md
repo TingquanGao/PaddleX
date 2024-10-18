@@ -24,7 +24,7 @@ for res in output:
 Note: Due to the tight correlation between time series data and scenarios, the official online experience models for time series tasks are tailored to specific scenarios and are not universal. Therefore, the online experience does not support using arbitrary files to test the official model solutions. However, after training your own model with scenario-specific data, you can select your trained model solution and use corresponding scenario data for online experience.
 
 ## 3. Choose a Model
-PaddleX provides five end-to-end time series forecasting models:
+PaddleX provides five end-to-end time series forecasting models. For details, refer to the [Model List](../support_list/models_list_en.md). The benchmarks of these models are as follows:
 
 | Model Name | MSE | MAE | Model Size (M) | Description |
 |-|-|-|-|-|
@@ -53,7 +53,8 @@ wget https://paddle-model-ecology.bj.bcebos.com/paddlex/PaddleX3.0/doc_images/pr
 tar -xf ./dataset/electricity.tar -C ./dataset/
 ```
 
-* **Data Considerations**
+**Data Considerations**
+
  * When annotating data for time series forecasting tasks, based on the collected real data, all data is arranged in chronological order. During training, the data is automatically divided into multiple time segments, where the historical time series data and the future sequences respectively represent the input data for training the model and its corresponding prediction targets, forming a set of training samples.
  * Handling Missing Values: To ensure data quality and integrity, missing values can be imputed based on expert knowledge or statistical methods.
  * Non-Repetitiveness: Ensure that data is collected in chronological order by row, with no duplication of timestamps.
@@ -175,7 +176,7 @@ After executing the above command, PaddleX will validate the dataset, summarize 
   "dataset_path": "./dataset/electricity",
   "show_type": "csv",
   "dataset_type": "TSDataset"
-} 
+}
 ```
 
 The above verification results have omitted some data parts. `check_pass` being True indicates that the dataset format meets the requirements. Explanations for other indicators are as follows:
@@ -233,6 +234,29 @@ For more hyperparameter introductions, refer to [PaddleX Time Series Task Model 
 
 * The above parameters can be set by appending command-line parameters, e.g., specifying the mode as model training: `-o Global.mode=train`; specifying the first GPU for training: `-o Global.device=gpu:0`; setting the number of training epochs to 10: `-o Train.epochs_iters=10`.
 * During model training, PaddleX automatically saves the model weight files, with the default being `output`. If you need to specify a save path, you can use the `-o Global.output` field in the configuration file.
+
+
+
+<details>
+   <summary> More Details (Click to Expand)  </summary>
+
+* During the model training process, PaddleX automatically saves the model weight files, with the default directory being output. If you need to specify a different save path, you can configure it through the `-o Global.output` field in the configuration file.
+* PaddleX abstracts away the concepts of dynamic graph weights and static graph weights from you. During model training, both dynamic and static graph weights are produced simultaneously. By default, static graph weights are selected for inference.
+* When training other models, you need to specify the corresponding configuration file. The correspondence between models and configuration files can be found in the [PaddleX Model List (CPU/GPU)](../support_list/models_list_en.md)
+
+After completing the model training, all outputs are saved in the specified output directory (default is `./output/`), typically including the following:
+
+**Explanation of Training Outputs:**
+
+After completing the model training, all outputs are saved in the specified output directory (default is `./output/`), typically including the following:
+
+`train_result.json`: A training result record file that logs whether the training task was completed normally, as well as the output weight metrics, relevant file paths, etc.
+`train.log`: A training log file that records changes in model metrics, loss values, and other information during the training process.
+`config.yaml`: The training configuration file that records the hyperparameter configurations for this training session.
+`best_accuracy.pdparams.tar`, `scaler.pkl`, `.checkpoints`, `.inference*`: Files related to model weights, including network parameters, optimizers, static graph network parameters, etc.
+
+</details>
+
 
 ### 5.2 Model Evaluation
 
@@ -319,8 +343,8 @@ from paddlex import create_pipeline
 pipeline = create_pipeline(pipeline="ts_forecast")
 output = pipeline.predict("pre_ts.csv")
 for res in output:
-    res.print() 
-    res.save_to_csv("./output/") 
+    res.print()
+    res.save_to_csv("./output/")
 ```
 For more parameters, please refer to the [Time Series forecast Pipeline Usage Tutorial](../pipeline_usage/tutorials/time_series_pipelines/time_series_anomaly_detection_en.md)
 

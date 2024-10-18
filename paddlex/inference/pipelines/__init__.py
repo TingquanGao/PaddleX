@@ -29,11 +29,64 @@ from .single_model_pipeline import (
     TSCls,
     MultiLableImageClas,
     SmallObjDet,
-    AnomolyDetection,
+    AnomalyDetection,
 )
 from .ocr import OCRPipeline
+from .formula_recognition import FormulaRecognitionPipeline
 from .table_recognition import TableRecPipeline
+from .seal_recognition import SealOCRPipeline
 from .ppchatocrv3 import PPChatOCRPipeline
+from .layout_parsing import LayoutParsingPipeline
+
+
+def load_pipeline_config(pipeline: str) -> Dict[str, Any]:
+    if not Path(pipeline).exists():
+        pipeline_path = get_pipeline_path(pipeline)
+        if pipeline_path is None:
+            raise Exception(
+                f"The pipeline ({pipeline}) does not exist! Please use a pipeline name or a config file path!"
+            )
+    else:
+        pipeline_path = pipeline
+    config = parse_config(pipeline_path)
+    return config
+
+
+def create_pipeline_from_config(
+    config: Dict[str, Any],
+    device=None,
+    pp_option=None,
+    use_hpip: bool = False,
+    hpi_params: Optional[Dict[str, Any]] = None,
+    *args,
+    **kwargs,
+) -> BasePipeline:
+    pipeline_name = config["Global"]["pipeline_name"]
+    pipeline_setting = config["Pipeline"]
+
+    predictor_kwargs = {"use_hpip": use_hpip}
+    if "use_hpip" in pipeline_setting:
+        predictor_kwargs["use_hpip"] = use_hpip
+    if hpi_params is not None:
+        predictor_kwargs["hpi_params"] = hpi_params
+        pipeline_setting.pop("hpi_params", None)
+    elif "hpi_params" in pipeline_setting:
+        predictor_kwargs["hpi_params"] = pipeline_setting.pop("hpi_params")
+
+    if pp_option is not None:
+        predictor_kwargs["pp_option"] = pp_option
+        pipeline_setting.pop("pp_option", None)
+    elif "pp_option" in pipeline_setting:
+        predictor_kwargs["pp_option"] = pipeline_setting.pop("pp_option")
+
+    device = device if device else pipeline_setting.pop("device", None)
+
+    pipeline_setting.update(kwargs)
+    pipeline = BasePipeline.get(pipeline_name)(
+        device=device, predictor_kwargs=predictor_kwargs, *args, **pipeline_setting
+    )
+
+    return pipeline
 
 
 def create_pipeline(
@@ -53,34 +106,13 @@ def create_pipeline(
     Returns:
         BasePipeline: the pipeline, which is subclass of BasePipeline.
     """
-    if not Path(pipeline).exists():
-        pipeline_path = get_pipeline_path(pipeline)
-        if pipeline_path is None:
-            raise Exception(
-                f"The pipeline({pipeline}) don't exist! Please use the pipeline name or config yaml file!"
-            )
-    config = parse_config(pipeline_path)
-    pipeline_name = config["Global"]["pipeline_name"]
-    pipeline_setting = config["Pipeline"]
-
-    predictor_kwargs = {"use_hpip": use_hpip}
-    if "use_hpip" in pipeline_setting:
-        predictor_kwargs["use_hpip"] = use_hpip
-    if hpi_params is not None:
-        predictor_kwargs["hpi_params"] = hpi_params
-    elif "hpi_params" in pipeline_setting:
-        predictor_kwargs["hpi_params"] = pipeline_setting.pop("hpi_params")
-    if device is not None:
-        predictor_kwargs["device"] = device
-    elif "device" in pipeline_setting:
-        predictor_kwargs["device"] = pipeline_setting.pop("device")
-    if pp_option is not None:
-        predictor_kwargs["pp_option"] = pp_option
-    elif "pp_option" in pipeline_setting:
-        predictor_kwargs["pp_option"] = pipeline_setting.pop("pp_option")
-
-    pipeline_setting.update(kwargs)
-    pipeline = BasePipeline.get(pipeline_name)(
-        predictor_kwargs=predictor_kwargs, *args, **pipeline_setting
+    config = load_pipeline_config(pipeline)
+    return create_pipeline_from_config(
+        config,
+        device=device,
+        pp_option=pp_option,
+        use_hpip=use_hpip,
+        hpi_params=hpi_params,
+        *args,
+        **kwargs,
     )
-    return pipeline

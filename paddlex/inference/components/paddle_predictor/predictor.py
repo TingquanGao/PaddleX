@@ -37,7 +37,7 @@ class BasePaddlePredictor(BaseComponent, PPEngineMixin):
         self.model_prefix = model_prefix
         self._is_initialized = False
 
-    def _reset(self):
+    def reset(self):
         if not self.option:
             self.option = PaddlePredictorOption()
         (
@@ -62,7 +62,7 @@ class BasePaddlePredictor(BaseComponent, PPEngineMixin):
         params_file = (self.model_dir / f"{self.model_prefix}.pdiparams").as_posix()
         config = Config(model_file, params_file)
 
-        if self.option.device == "gpu":
+        if self.option.device in ("gpu", "dcu"):
             config.enable_use_gpu(200, self.option.device_id)
             if paddle.is_compiled_with_rocm():
                 os.environ["FLAGS_conv_workspace_size_limit"] = "2000"
@@ -164,7 +164,7 @@ No need to generate again."
 
     def apply(self, **kwargs):
         if not self._is_initialized:
-            self._reset()
+            self.reset()
 
         x = self.to_batch(**kwargs)
         for idx in range(len(x)):
@@ -196,6 +196,7 @@ class ImagePredictor(BasePaddlePredictor):
 
 
 class ImageDetPredictor(BasePaddlePredictor):
+
     INPUT_KEYS = [["img", "scale_factors"], ["img", "scale_factors", "img_size"]]
     OUTPUT_KEYS = [["boxes"], ["boxes", "masks"]]
     DEAULT_INPUTS = {"img": "img", "scale_factors": "scale_factors"}
@@ -209,7 +210,7 @@ class ImageDetPredictor(BasePaddlePredictor):
                 np.stack(scale_factors, axis=0).astype(dtype=np.float32, copy=False),
             ]
         else:
-            # img_size = [img_size[::-1] for img_size in img_size]
+            img_size = [img_size[::-1] for img_size in img_size]
             return [
                 np.stack(img_size, axis=0).astype(dtype=np.float32, copy=False),
                 np.stack(img, axis=0).astype(dtype=np.float32, copy=False),

@@ -15,24 +15,26 @@
 import cv2
 import numpy as np
 from pathlib import Path
+import PIL
+from PIL import Image, ImageDraw, ImageFont
 
 from .utils.mixin import HtmlMixin, XlsxMixin
 from .base import BaseResult, CVResult
 
 
-class TableRecResult(CVResult, HtmlMixin):
+class TableRecResult(CVResult):
     """SaveTableResults"""
+
+    _HARD_FLAG = False
 
     def __init__(self, data):
         super().__init__(data)
-        HtmlMixin.__init__(self)
-        self._show_func_register("save_to_html")(self.save_to_html)
-
-    def _to_html(self):
-        return self["html"]
 
     def _to_img(self):
         image = self._img_reader.read(self["input_path"])
+        if self._HARD_FLAG:
+            image_np = np.array(image)
+            image = Image.fromarray(image_np[:, :, ::-1])
         bbox_res = self["bbox"]
         if len(bbox_res) > 0 and len(bbox_res[0]) == 4:
             vis_img = self.draw_rectangle(image, bbox_res)
@@ -57,12 +59,17 @@ class TableRecResult(CVResult, HtmlMixin):
         return image
 
 
-class StructureTableResult(TableRecResult, XlsxMixin):
+class StructureTableResult(TableRecResult, HtmlMixin, XlsxMixin):
     """StructureTableResult"""
 
     def __init__(self, data):
         super().__init__(data)
+        HtmlMixin.__init__(self)
+        self._show_func_register("save_to_html")(self.save_to_html)
         XlsxMixin.__init__(self)
+
+    def _to_html(self):
+        return self["html"]
 
 
 class TableResult(BaseResult):

@@ -46,7 +46,7 @@ wget https://paddle-model-ecology.bj.bcebos.com/paddlex/data/ts_classify_example
 tar -xf ./dataset/ts_classify_examples.tar -C ./dataset/
 ```
 
-* **Data Considerations**
+**Data Considerations**
   * Based on collected real data, clarify the classification objectives of the time series data and define corresponding classification labels. For example, in stock price classification, labels might be "Rise" or "Fall." For a time series that is "Rising" over a period, it can be considered a sample (group), where each time point in this period shares a common group_id.
   * Uniform Time Series Length: Ensure that the length of the time series for each group is consistent.
 Missing Value Handling: To guarantee the quality and integrity of the data, missing values can be imputed based on expert experience or statistical methods.
@@ -115,7 +115,7 @@ python main.py -c paddlex/configs/ts_classification/TimesNet_cls.yaml \
 -o Train.target_cols=dim_0,dim_1,dim_2 \
 -o Train.freq=1 \
 -o Train.group_id=group_id \
--o Train.static_cov_cols=label 
+-o Train.static_cov_cols=label
 ```
 PaddleX supports modifying training hyperparameters and single-machine single-GPU training (time-series models only support single-GPU training). Simply modify the configuration file or append command-line parameters.
 
@@ -140,14 +140,25 @@ For more hyperparameter introductions, please refer to [PaddleX Time Series Task
 * The above parameters can be set by appending command-line parameters, e.g., specifying the mode as model training: `-o Global.mode=train`; specifying the first GPU for training: `-o Global.device=gpu:0`; setting the number of training epochs to 10: `-o Train.epochs_iters=10`.
 * During model training, PaddleX automatically saves model weight files, with the default being `output`. To specify a save path, use the `-o Global.output` field in the configuration file.
 
-**Training Output Explanation**:
+<details>
+   <summary> More Details (Click to Expand)  </summary>
 
-After completing model training, all outputs are saved in the specified output directory (default is `./output/`), typically including:
+* During the model training process, PaddleX automatically saves the model weight files, with the default directory being output. If you need to specify a different save path, you can configure it through the `-o Global.output` field in the configuration file.
+* PaddleX abstracts away the concepts of dynamic graph weights and static graph weights from you. During model training, both dynamic and static graph weights are produced simultaneously. By default, static graph weights are selected for inference.
+* When training other models, you need to specify the corresponding configuration file. The correspondence between models and configuration files can be found in the [PaddleX Model List (CPU/GPU)](../support_list/models_list_en.md)
 
-* train_result.json: Training result record file, recording whether the training task completed normally, as well as the output weight metrics, relevant file paths, etc.;
-* train.log: Training log file, recording changes in model metrics, loss, etc. during training;
-* config.yaml: Training configuration file;
-* The model weight-related files such as .pdparams, .pkl, model_meta, checkpoint, and best_accuracy.pdparams.tar contain network parameters, optimizers, normalization configurations, network parameters again (possibly for clarity or differentiation), data information, and compressed packages of the best model weights, among other things.
+After completing the model training, all outputs are saved in the specified output directory (default is `./output/`), typically including the following:
+
+**Explanation of Training Outputs:**
+
+After completing the model training, all outputs are saved in the specified output directory (default is `./output/`), typically including the following:
+
+`train_result.json`: A training result record file that logs whether the training task was completed normally, as well as the output weight metrics, relevant file paths, etc.
+`train.log`: A training log file that records changes in model metrics, loss values, and other information during the training process.
+`config.yaml`: The training configuration file that records the hyperparameter configurations for this training session.
+`best_accuracy.pdparams.tar`, `scaler.pkl`, `.checkpoints`, `.inference*`: Files related to model weights, including network parameters, optimizers, static graph network parameters, etc.
+
+</details>
 
 ### 5.2 Model Evaluation
 After completing model training, you can evaluate the specified model weights file on the validation set to verify the model's accuracy. Using PaddleX for model evaluation requires just one command:

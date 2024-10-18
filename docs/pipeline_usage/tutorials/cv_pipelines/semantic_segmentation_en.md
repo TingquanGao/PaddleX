@@ -3,14 +3,14 @@
 # General Semantic Segmentation Pipeline Tutorial
 
 ## 1. Introduction to the General Semantic Segmentation Pipeline
-Semantic segmentation is a computer vision technique that aims to assign each pixel in an image to a specific category, enabling a detailed understanding of the image content. Semantic segmentation not only identifies the types of objects in an image but also classifies each pixel, allowing regions of the same category to be fully labeled. For example, in a street scene image, semantic segmentation can distinguish pedestrians, cars, the sky, and roads pixel by pixel, forming a detailed label map. This technology is widely used in autonomous driving, medical image analysis, and human-computer interaction, often relying on deep learning models (such as FCN, U-Net, etc.) to extract features and achieve high-precision pixel-level classification, providing a foundation for further intelligent analysis.
+Semantic segmentation is a computer vision technique that aims to assign each pixel in an image to a specific category, enabling a detailed understanding of the image content. Semantic segmentation not only identifies the types of objects in an image but also classifies each pixel, allowing regions of the same category to be fully labeled. For example, in a street scene image, semantic segmentation can distinguish pedestrians, cars, the sky, and roads pixel by pixel, forming a detailed label map. This technology is widely used in autonomous driving, medical image analysis, and human-computer interaction, often relying on deep learning models (such as SegFormer, etc.) to extract features by CNN or Transformer, and achieve high-precision pixel-level classification, providing a foundation for further intelligent analysis.
 
-![](/tmp/images/pipelines/semantic_segmentation/01.png)
+![](https://raw.githubusercontent.com/cuicheng01/PaddleX_doc_images/main/images/pipelines/semantic_segmentation/01.png)
 
 <details>
    <summary> 👉 Model List Details</summary>
 
-|Model Name|mIoU (%)|GPU Inference Time (ms)|CPU Inference Time|Model Size (M)|
+|Model Name|mIoU (%)|GPU Inference Time (ms)|CPU Inference Time (ms)|Model Size (M)|
 |-|-|-|-|-|
 |Deeplabv3_Plus-R50 |80.36|61.0531|1513.58|94.9 M|
 |Deeplabv3_Plus-R101|81.10|100.026|2460.71|162.5 M|
@@ -30,7 +30,7 @@ Semantic segmentation is a computer vision technique that aims to assign each pi
 **The accuracy metrics of the above models are measured on the [Cityscapes](https://www.cityscapes-dataset.com/) dataset. GPU inference time is based on an NVIDIA Tesla T4 machine with FP32 precision. CPU inference speed is based on an Intel(R) Xeon(R) Gold 5117 CPU @ 2.00GHz with 8 threads and FP32 precision.**
 
 
-|Model Name|mIoU (%)|GPU Inference Time (ms)|CPU Inference Time|Model Size (M)|
+|Model Name|mIoU (%)|GPU Inference Time (ms)|CPU Inference Time (ms)|Model Size (M)|
 |-|-|-|-|-|
 |SeaFormer_base(slice)|40.92|24.4073|397.574|30.8 M|
 |SeaFormer_large (slice)|43.66|27.8123|550.464|49.8 M|
@@ -47,7 +47,7 @@ PaddleX's pre-trained model pipelines can be quickly experienced. You can experi
 ### 2.1 Online Experience
 You can [experience online](https://aistudio.baidu.com/community/app/100062/webUI?source=appCenter) the effects of the General Semantic Segmentation Pipeline, using the official demo images for recognition, for example:
 
-![](/tmp/images/pipelines/semantic_segmentation/02.png)
+![](https://raw.githubusercontent.com/cuicheng01/PaddleX_doc_images/main/images/pipelines/semantic_segmentation/02.png)
 
 If you are satisfied with the pipeline's performance, you can directly integrate and deploy it. If not, you can also use your private data to **fine-tune the model in the pipeline online**.
 
@@ -81,13 +81,13 @@ paddlex --get_pipeline_config semantic_segmentation
 After execution, the semantic segmentation pipeline configuration file will be saved in the current path. If you wish to customize the save location, execute the following command (assuming the custom save location is `./my_path`):
 
 ```bash
-paddlex --get_pipeline_config semantic_segmentation --config_save_path ./my_path
+paddlex --get_pipeline_config semantic_segmentation --save_path ./my_path
 ```
 
 After obtaining the pipeline configuration file, replace `--pipeline` with the configuration file save path to make the configuration file take effect. For example, if the configuration file save path is `./semantic_segmentation.yaml`, simply execute:
 
 ```bash
-paddlex --pipeline ./semantic_segmentation.yaml --input makassaridn-road_demo.png
+paddlex --pipeline ./semantic_segmentation.yaml --input makassaridn-road_demo.png --device gpu:0
 ```
 
 Here, parameters such as `--model` and `--device` do not need to be specified, and the parameters in the configuration file will be used. If parameters are still specified, the specified parameters will take precedence.
@@ -97,12 +97,12 @@ Here, parameters such as `--model` and `--device` do not need to be specified, a
 After running, the result is:
 
 ```bash
-{'img_path': '/root/.paddlex/predict_input/general_object_detection_002.png'}
+{'input_path': 'general_object_detection_002.png'}
 ```
 
-![](/tmp/images/pipelines/semantic_segmentation/03.png)
+![](https://raw.githubusercontent.com/cuicheng01/PaddleX_doc_images/main/images/pipelines/semantic_segmentation/03.png)
 
-The visualization images are saved in the `output` directory by default, and you can also customize it through `--save_path`.
+The visualized image not saved by default. You can customize the save path through `--save_path`, and then all results will be saved in the specified path.
 
 #### 2.2.2 Python Script Integration
 A few lines of code can complete the quick inference of the pipeline. Taking the general semantic segmentation pipeline as an example:
@@ -172,57 +172,57 @@ If you need to directly apply the pipeline in your Python project, refer to the 
 
 Additionally, PaddleX provides three other deployment methods, detailed as follows:
 
-🚀 **High-Performance Deployment**: In actual production environments, many applications have stringent standards for the performance metrics of deployment strategies (especially response speed) to ensure efficient system operation and smooth user experience. To this end, PaddleX provides high-performance inference plugins that aim to deeply optimize model inference and pre/post-processing for significant end-to-end speedups. For detailed high-performance deployment procedures, refer to the [PaddleX High-Performance Deployment Guide](../../../pipeline_deploy/high_performance_deploy_en.md).
+🚀 **High-Performance Inference**: In actual production environments, many applications have stringent standards for the performance metrics of deployment strategies (especially response speed) to ensure efficient system operation and smooth user experience. To this end, PaddleX provides high-performance inference plugins that aim to deeply optimize model inference and pre/post-processing for significant end-to-end speedups. For detailed high-performance inference procedures, refer to the [PaddleX High-Performance Inference Guide](../../../pipeline_deploy/high_performance_inference_en.md).
 
 ☁️ **Service-Oriented Deployment**: Service-oriented deployment is a common deployment form in actual production environments. By encapsulating inference functions as services, clients can access these services through network requests to obtain inference results. PaddleX supports users in achieving low-cost service-oriented deployment of pipelines. For detailed service-oriented deployment procedures, refer to the [PaddleX Service-Oriented Deployment Guide](../../../pipeline_deploy/service_deploy_en.md).
 
 Below are the API references and multi-language service invocation examples:
 
-<details>  
-<summary>API Reference</summary>  
-  
-对于服务提供的所有操作：
+<details>
+<summary>API Reference</summary>
 
-- 响应体以及POST请求的请求体均为JSON数据（JSON对象）。
-- 当请求处理成功时，响应状态码为`200`，响应体的属性如下：
+For all operations provided by the service:
 
-    |名称|类型|含义|
-    |-|-|-|
-    |`errorCode`|`integer`|错误码。固定为`0`。|
-    |`errorMsg`|`string`|错误说明。固定为`"Success"`。|
+- Both the response body and the request body for POST requests are JSON data (JSON objects).
+- When the request is processed successfully, the response status code is `200`, and the response body properties are as follows:
 
-    响应体还可能有`result`属性，类型为`object`，其中存储操作结果信息。
+    | Name | Type | Description |
+    |------|------|-------------|
+    |`errorCode`|`integer`|Error code. Fixed as `0`.|
+    |`errorMsg`|`string`|Error description. Fixed as `"Success"`.|
 
-- 当请求处理未成功时，响应体的属性如下：
+    The response body may also have a `result` property of type `object`, which stores the operation result information.
 
-    |名称|类型|含义|
-    |-|-|-|
-    |`errorCode`|`integer`|错误码。与响应状态码相同。|
-    |`errorMsg`|`string`|错误说明。|
+- When the request is not processed successfully, the response body properties are as follows:
 
-服务提供的操作如下：
+    | Name | Type | Description |
+    |------|------|-------------|
+    |`errorCode`|`integer`|Error code. Same as the response status code.|
+    |`errorMsg`|`string`|Error description.|
+
+Operations provided by the service are as follows:
 
 - **`infer`**
 
-    对图像进行语义分割。
+    Performs semantic segmentation on an image.
 
     `POST /semantic-segmentation`
 
-    - 请求体的属性如下：
+    - The request body properties are as follows:
 
-        |名称|类型|含义|是否必填|
-        |-|-|-|-|
-        |`image`|`string`|服务可访问的图像文件的URL或图像文件内容的Base64编码结果。|是|
+        | Name | Type | Description | Required |
+        |------|------|-------------|----------|
+        |`image`|`string`|The URL of an image file accessible by the service or the Base64 encoded result of the image file content.|Yes|
 
-    - 请求处理成功时，响应体的`result`具有如下属性：
+    - When the request is processed successfully, the `result` of the response body has the following properties:
 
-        |名称|类型|含义|
-        |-|-|-|
-        |`labelMap`|`array`|记录图像中每个像素的类别标签（按照行优先顺序排列）。|
-        |`size`|`array`|图像形状。数组中元素依次为图像的高度和宽度。|
-        |`image`|`string`|语义分割结果图。图像为JPEG格式，使用Base64编码。|
+        | Name | Type | Description |
+        |------|------|-------------|
+        |`labelMap`|`array`|Records the class label of each pixel in the image (arranged in row-major order).|
+        |`size`|`array`|Image shape. The elements in the array are the height and width of the image, respectively.|
+        |`image`|`string`|The semantic segmentation result image. The image is in JPEG format and encoded using Base64.|
 
-        `result`示例如下：
+        An example of `result` is as follows:
 
         ```json
         {
@@ -243,43 +243,39 @@ Below are the API references and multi-language service invocation examples:
 </details>
 
 <details>
-<summary>Multilingual Service Invocation Examples</summary>  
+<summary>Multi-Language Service Invocation Examples</summary>
 
-<details>  
-<summary>Python</summary>  
-  
+<details>
+<summary>Python</summary>
+
 ```python
 import base64
 import requests
 
-API_URL = "http://localhost:8080/semantic-segmentation" # 服务URL
+API_URL = "http://localhost:8080/semantic-segmentation"
 image_path = "./demo.jpg"
 output_image_path = "./out.jpg"
 
-# 对本地图像进行Base64编码
 with open(image_path, "rb") as file:
     image_bytes = file.read()
     image_data = base64.b64encode(image_bytes).decode("ascii")
 
-payload = {"image": image_data}  # Base64编码的文件内容或者图像URL
+payload = {"image": image_data}
 
-# 调用API
 response = requests.post(API_URL, json=payload)
 
-# 处理接口返回数据
 assert response.status_code == 200
 result = response.json()["result"]
 with open(output_image_path, "wb") as file:
     file.write(base64.b64decode(result["image"]))
 print(f"Output image saved at {output_image_path}")
-# result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
 ```
-  
+
 </details>
 
-<details>  
-<summary>C++</summary>  
-  
+<details>
+<summary>C++</summary>
+
 ```cpp
 #include <iostream>
 #include "cpp-httplib/httplib.h" // https://github.com/Huiyicc/cpp-httplib
@@ -295,7 +291,6 @@ int main() {
         {"Content-Type", "application/json"}
     };
 
-    // 对本地图像进行Base64编码
     std::ifstream file(imagePath, std::ios::binary | std::ios::ate);
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
@@ -312,9 +307,7 @@ int main() {
     jsonObj["image"] = encodedImage;
     std::string body = jsonObj.dump();
 
-    // 调用API
     auto response = client.Post("/semantic-segmentation", headers, body, "application/json");
-    // 处理接口返回数据
     if (response && response->status == 200) {
         nlohmann::json jsonResponse = nlohmann::json::parse(response->body);
         auto result = jsonResponse["result"];
@@ -327,7 +320,6 @@ int main() {
             outputImage.write(reinterpret_cast<char*>(decodedImage.data()), decodedImage.size());
             outputImage.close();
             std::cout << "Output image saved at " << outPutImagePath << std::endl;
-            // result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
         } else {
             std::cerr << "Unable to open file for writing: " << outPutImagePath << std::endl;
         }
@@ -339,12 +331,12 @@ int main() {
     return 0;
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Java</summary>  
-  
+<details>
+<summary>Java</summary>
+
 ```java
 import okhttp3.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -358,20 +350,18 @@ import java.util.Base64;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        String API_URL = "http://localhost:8080/semantic-segmentation"; // 服务URL
-        String imagePath = "./demo.jpg"; // 本地图像
-        String outputImagePath = "./out.jpg"; // 输出图像
+        String API_URL = "http://localhost:8080/semantic-segmentation";
+        String imagePath = "./demo.jpg";
+        String outputImagePath = "./out.jpg";
 
-        // 对本地图像进行Base64编码
         File file = new File(imagePath);
         byte[] fileContent = java.nio.file.Files.readAllBytes(file.toPath());
         String imageData = Base64.getEncoder().encodeToString(fileContent);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode params = objectMapper.createObjectNode();
-        params.put("image", imageData); // Base64编码的文件内容或者图像URL
+        params.put("image", imageData);
 
-        // 创建 OkHttpClient 实例
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.Companion.get("application/json; charset=utf-8");
         RequestBody body = RequestBody.Companion.create(params.toString(), JSON);
@@ -380,7 +370,6 @@ public class Main {
                 .post(body)
                 .build();
 
-        // 调用API并处理接口返回数据
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 String responseBody = response.body().string();
@@ -394,7 +383,6 @@ public class Main {
                     fos.write(imageBytes);
                 }
                 System.out.println("Output image saved at " + outputImagePath);
-                // result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
             } else {
                 System.err.println("Request failed with code: " + response.code());
             }
@@ -402,98 +390,94 @@ public class Main {
     }
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Go</summary>  
-  
+<details>
+<summary>Go</summary>
+
 ```go
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+    "bytes"
+    "encoding/base64"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
 )
 
 func main() {
-	API_URL := "http://localhost:8080/semantic-segmentation"
-	imagePath := "./demo.jpg"
-	outputImagePath := "./out.jpg"
+    API_URL := "http://localhost:8080/semantic-segmentation"
+    imagePath := "./demo.jpg"
+    outputImagePath := "./out.jpg"
 
-	// 对本地图像进行Base64编码
-	imageBytes, err := ioutil.ReadFile(imagePath)
-	if err != nil {
-		fmt.Println("Error reading image file:", err)
-		return
-	}
-	imageData := base64.StdEncoding.EncodeToString(imageBytes)
+    imageBytes, err := ioutil.ReadFile(imagePath)
+    if err != nil {
+        fmt.Println("Error reading image file:", err)
+        return
+    }
+    imageData := base64.StdEncoding.EncodeToString(imageBytes)
 
-	payload := map[string]string{"image": imageData} // Base64编码的文件内容或者图像URL
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		fmt.Println("Error marshaling payload:", err)
-		return
-	}
+    payload := map[string]string{"image": imageData}
+    payloadBytes, err := json.Marshal(payload)
+    if err != nil {
+        fmt.Println("Error marshaling payload:", err)
+        return
+    }
 
-	// 调用API
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", API_URL, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return
-	}
+    client := &http.Client{}
+    req, err := http.NewRequest("POST", API_URL, bytes.NewBuffer(payloadBytes))
+    if err != nil {
+        fmt.Println("Error creating request:", err)
+        return
+    }
 
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error sending request:", err)
-		return
-	}
-	defer res.Body.Close()
+    res, err := client.Do(req)
+    if err != nil {
+        fmt.Println("Error sending request:", err)
+        return
+    }
+    defer res.Body.Close()
 
-    // 处理接口返回数据
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return
-	}
-	type Response struct {
-		Result struct {
-			Image      string   `json:"image"`
-			Labelmap []map[string]interface{} `json:"labelMap"`
-		} `json:"result"`
-	}
-	var respData Response
-	err = json.Unmarshal([]byte(string(body)), &respData)
-	if err != nil {
-		fmt.Println("Error unmarshaling response body:", err)
-		return
-	}
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Println("Error reading response body:", err)
+        return
+    }
+    type Response struct {
+        Result struct {
+            Image      string   `json:"image"`
+            Labelmap []map[string]interface{} `json:"labelMap"`
+        } `json:"result"`
+    }
+    var respData Response
+    err = json.Unmarshal([]byte(string(body)), &respData)
+    if err != nil {
+        fmt.Println("Error unmarshaling response body:", err)
+        return
+    }
 
-	outputImageData, err := base64.StdEncoding.DecodeString(respData.Result.Image)
-	if err != nil {
-		fmt.Println("Error decoding base64 image data:", err)
-		return
-	}
-	err = ioutil.WriteFile(outputImagePath, outputImageData, 0644)
-	if err != nil {
-		fmt.Println("Error writing image to file:", err)
-		return
-	}
-	fmt.Printf("Image saved at %s.jpg\n", outputImagePath)
-	// result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
+    outputImageData, err := base64.StdEncoding.DecodeString(respData.Result.Image)
+    if err != nil {
+        fmt.Println("Error decoding base64 image data:", err)
+        return
+    }
+    err = ioutil.WriteFile(outputImagePath, outputImageData, 0644)
+    if err != nil {
+        fmt.Println("Error writing image to file:", err)
+        return
+    }
+    fmt.Printf("Image saved at %s.jpg\n", outputImagePath)
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>C#</summary>  
-  
+<details>
+<summary>C#</summary>
+
 ```csharp
 using System;
 using System.IO;
@@ -513,18 +497,15 @@ class Program
     {
         var httpClient = new HttpClient();
 
-        // 对本地图像进行Base64编码
         byte[] imageBytes = File.ReadAllBytes(imagePath);
         string image_data = Convert.ToBase64String(imageBytes);
 
-        var payload = new JObject{ { "image", image_data } }; // Base64编码的文件内容或者图像URL
+        var payload = new JObject{ { "image", image_data } };
         var content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
 
-        // 调用API
         HttpResponseMessage response = await httpClient.PostAsync(API_URL, content);
         response.EnsureSuccessStatusCode();
 
-        // 处理接口返回数据
         string responseBody = await response.Content.ReadAsStringAsync();
         JObject jsonResponse = JObject.Parse(responseBody);
 
@@ -533,16 +514,15 @@ class Program
 
         File.WriteAllBytes(outputImagePath, outputImageBytes);
         Console.WriteLine($"Output image saved at {outputImagePath}");
-        // result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
     }
 }
 ```
-  
+
 </details>
 
-<details>  
-<summary>Node.js</summary>  
-  
+<details>
+<summary>Node.js</summary>
+
 ```js
 const axios = require('axios');
 const fs = require('fs');
@@ -556,50 +536,44 @@ let config = {
    maxBodyLength: Infinity,
    url: API_URL,
    data: JSON.stringify({
-    'image': encodeImageToBase64(imagePath)  // Base64编码的文件内容或者图像URL
+    'image': encodeImageToBase64(imagePath)
   })
 };
 
-// 对本地图像进行Base64编码
 function encodeImageToBase64(filePath) {
   const bitmap = fs.readFileSync(filePath);
   return Buffer.from(bitmap).toString('base64');
 }
 
-// 调用API
 axios.request(config)
 .then((response) => {
-    // 处理接口返回数据
     const result = response.data["result"];
     const imageBuffer = Buffer.from(result["image"], 'base64');
     fs.writeFile(outputImagePath, imageBuffer, (err) => {
       if (err) throw err;
       console.log(`Output image saved at ${outputImagePath}`);
     });
-    // result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
 })
 .catch((error) => {
   console.log(error);
 });
 ```
-  
+
 </details>
 
-<details>  
-<summary>PHP</summary>  
-  
+<details>
+<summary>PHP</summary>
+
 ```php
 <?php
 
-$API_URL = "http://localhost:8080/semantic-segmentation"; // 服务URL
+$API_URL = "http://localhost:8080/semantic-segmentation";
 $image_path = "./demo.jpg";
 $output_image_path = "./out.jpg";
 
-// 对本地图像进行Base64编码
 $image_data = base64_encode(file_get_contents($image_path));
-$payload = array("image" => $image_data); // Base64编码的文件内容或者图像URL
+$payload = array("image" => $image_data);
 
-// 调用API
 $ch = curl_init($API_URL);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -607,14 +581,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($ch);
 curl_close($ch);
 
-// 处理接口返回数据
 $result = json_decode($response, true)["result"];
 file_put_contents($output_image_path, base64_decode($result["image"]));
 echo "Output image saved at " . $output_image_path . "\n";
-// result.labelMap 记录图像中每个像素的类别标签（按照行优先顺序排列）详见API参考文档
 ?>
 ```
-  
+
 </details>
 
 </details>
@@ -623,7 +595,7 @@ echo "Output image saved at " . $output_image_path . "\n";
 📱 **Edge Deployment**: Edge deployment is a method that places computing and data processing functions on user devices themselves, allowing devices to process data directly without relying on remote servers. PaddleX supports deploying models on edge devices such as Android. For detailed edge deployment procedures, refer to the [PaddleX Edge Deployment Guide](../../../pipeline_deploy/lite_deploy.md).
 Choose the appropriate deployment method for your model pipeline based on your needs, and proceed with subsequent AI application integration.
 
-## 4. Customization and Fine-tuning
+## 4. Custom Development
 If the default model weights provided by the general semantic segmentation pipeline do not meet your requirements for accuracy or speed in your specific scenario, you can try to further fine-tune the existing model using **your own domain-specific or application-specific data** to improve the recognition performance of the general semantic segmentation pipeline in your scenario.
 
 ### 4.1 Model Fine-tuning
@@ -652,9 +624,9 @@ For example, if you use an NVIDIA GPU for semantic segmentation pipeline inferen
 ```bash
 paddlex --pipeline semantic_segmentation --input makassaridn-road_demo.png --device gpu:0
 ``````
-At this point, if you wish to switch the hardware to Ascend NPU, simply modify the `--device` flag in the Python command to `npu`:
+At this point, if you wish to switch the hardware to Ascend NPU, simply modify the `--device` flag in the Python command to `npu:0`:
 
 ```bash
 paddlex --pipeline semantic_segmentation --input makassaridn-road_demo.png --device npu:0
 ```
-If you want to use the General Semantic Segmentation Pipeline on a wider range of hardware, please refer to the [PaddleX Multi-Device Usage Guide](../../../other_devices_support/installation_other_devices_en.md).
+If you want to use the General Semantic Segmentation Pipeline on a wider range of hardware, please refer to the [PaddleX Multi-Device Usage Guide](../../../other_devices_support/multi_devices_use_guide_en.md).
