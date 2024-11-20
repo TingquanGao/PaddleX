@@ -12,8 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import abstractmethod
+
+from ....utils import logging
 from .component import BaseComponent
-from .transformer import BaseTransformer
-from .predictor import BasePredictor, BasicPredictor
-from .result import BaseResult, CVResult
-from .batch_sampler import BaseBatchSampler, BatchData
+
+
+class BaseTransformer(BaseComponent):
+
+    def __call__(self, batch_data):
+        logging.debug(f"Call apply() func...")
+        kwargs = {k: batch_data.get_by_key(v) for k, v in self.inputs}
+        output = self.apply(**kwargs)
+        if not output:
+            return batch_data
+        batch_data.update_by_key({f"{self.name}.{key}": output[key] for key in output})
+        return batch_data
+
+    @abstractmethod
+    def apply(self, input):
+        raise NotImplementedError

@@ -12,10 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ...modules.face_recognition.model_list import MODELS
-from .general_recognition import ShiTuRecPredictor
-
-
-class FaceRecPredictor(ShiTuRecPredictor):
-
-    entities = MODELS
+from .predictor import TextDetPredictor

@@ -12,8 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .component import BaseComponent
-from .transformer import BaseTransformer
-from .predictor import BasePredictor, BasicPredictor
-from .result import BaseResult, CVResult
-from .batch_sampler import BaseBatchSampler, BatchData
+from .batch_sampler import BaseBatchSampler
+from .batch_data import BatchData

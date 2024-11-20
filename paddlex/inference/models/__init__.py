@@ -19,22 +19,24 @@ from typing import Any, Dict, Optional
 from ...utils import errors
 from ..utils.official_models import official_models
 from .base import BasePredictor, BasicPredictor
+
 from .image_classification import ClasPredictor
 from .text_detection import TextDetPredictor
 from .text_recognition import TextRecPredictor
-from .table_recognition import TablePredictor
-from .object_detection import DetPredictor
-from .instance_segmentation import InstanceSegPredictor
-from .semantic_segmentation import SegPredictor
-from .general_recognition import ShiTuRecPredictor
-from .ts_fc import TSFcPredictor
-from .ts_ad import TSAdPredictor
-from .ts_cls import TSClsPredictor
-from .image_unwarping import WarpPredictor
-from .multilabel_classification import MLClasPredictor
-from .anomaly_detection import UadPredictor
-from .formula_recognition import LaTeXOCRPredictor
-from .face_recognition import FaceRecPredictor
+
+# from .table_recognition import TablePredictor
+# from .object_detection import DetPredictor
+# from .instance_segmentation import InstanceSegPredictor
+# from .semantic_segmentation import SegPredictor
+# from .general_recognition import ShiTuRecPredictor
+# from .ts_fc import TSFcPredictor
+# from .ts_ad import TSAdPredictor
+# from .ts_cls import TSClsPredictor
+# from .image_unwarping import WarpPredictor
+# from .multilabel_classification import MLClasPredictor
+# from .anomaly_detection import UadPredictor
+# from .formula_recognition import LaTeXOCRPredictor
+# from .face_recognition import FaceRecPredictor
 
 
 def _create_hp_predictor(

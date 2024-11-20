@@ -12,44 +12,67 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-
-from ...utils.func_register import FuncRegister
-from ...modules.image_classification.model_list import MODELS
-from ..components import *
-from ..results import TopkResult
-from .base import BasicPredictor
+from ....utils.func_register import FuncRegister
+from ....modules.image_classification.model_list import MODELS
+from ..base import BasicPredictor
+from ..common.vision import *
+from ..common.infer import PaddleStaticInfer
+from .processors import *
+from .result import TopkResult
 
 
 class ClasPredictor(BasicPredictor):
 
-    entities = [*MODELS]
+    entities = MODELS
 
     _FUNC_MAP = {}
     register = FuncRegister(_FUNC_MAP)
 
-    def _build_components(self):
-        self._add_component(ReadImage(format="RGB"))
+    def _build_batch_sampler(self):
+        return ImageBatchSampler()
+
+    def _get_result_class(self):
+        return TopkResult
+
+    def _build_processors(self):
+        self._add_processor(ReadImage(format="RGB"))
         for cfg in self.config["PreProcess"]["transform_ops"]:
             tf_key = list(cfg.keys())[0]
             func = self._FUNC_MAP[tf_key]
             args = cfg.get(tf_key, {})
             op = func(self, **args) if args else func(self)
-            self._add_component(op)
+            self._add_processor(op)
+        self._add_processor(ImagesToBatch())
 
-        predictor = ImagePredictor(
+        predictor = PaddleStaticInfer(
             model_dir=self.model_dir,
             model_prefix=self.MODEL_FILE_PREFIX,
             option=self.pp_option,
         )
-        self._add_component(predictor)
+        self._add_processor(predictor)
 
         post_processes = self.config["PostProcess"]
         for key in post_processes:
             func = self._FUNC_MAP.get(key)
             args = post_processes.get(key, {})
             op = func(self, **args) if args else func(self)
-            self._add_component(op)
+            self._add_processor(op)
+
+    def _set_dataflow(self):
+        self.ReadImage.inputs.img.fetch(self.batch_sampler.outputs.img)
+        self.Resize.inputs.img.fetch(self.ReadImage.outputs.img)
+        self.Crop.inputs.img.fetch(self.Resize.outputs.img)
+        self.Normalize.inputs.img.fetch(self.Crop.outputs.img)
+        self.ToCHWImage.inputs.img.fetch(self.Normalize.outputs.img)
+        self.ImagesToBatch.inputs.img.fetch(self.ToCHWImage.outputs.img)
+        self.PaddleStaticInfer.inputs.batch.fetch(self.ImagesToBatch.outputs.batch)
+        self.Topk.inputs.pred.fetch(self.PaddleStaticInfer.outputs.pred)
+        self.result_packager.inputs.input_img.fetch(self.ReadImage.outputs.img)
+        self.result_packager.inputs.input_path.fetch(self.batch_sampler.outputs.img)
+        self.result_packager.inputs.class_ids.fetch(self.Topk.outputs.class_ids)
+        self.result_packager.inputs.scores.fetch(self.Topk.outputs.scores)
+        if self.Topk.class_id_map is not None:
+            self.result_packager.inputs.label_names.fetch(self.Topk.outputs.label_names)
 
     @register("ResizeImage")
     # TODO(gaotingquan): backend & interpolation
@@ -63,6 +86,7 @@ class ClasPredictor(BasicPredictor):
             )
         else:
             op = Resize(target_size=size)
+        op.name = "Resize"
         return op
 
     @register("CropImage")
@@ -93,9 +117,3 @@ class ClasPredictor(BasicPredictor):
     @register("MultiLabelThreshOutput")
     def build_threshoutput(self, threshold, label_list=None):
         return MultiLabelThreshOutput(threshold=float(threshold), class_ids=label_list)
-
-    def _pack_res(self, single):
-        keys = ["input_path", "class_ids", "scores"]
-        if "label_names" in single:
-            keys.append("label_names")
-        return TopkResult({key: single[key] for key in keys})

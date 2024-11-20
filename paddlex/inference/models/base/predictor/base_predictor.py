@@ -12,24 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import yaml
-import codecs
 from pathlib import Path
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
-from ...components.base import BaseComponent
-from ...utils.process_hook import generatorable_method
+from ....utils.io import YAMLReader
 
 
-class BasePredictor(BaseComponent):
-
-    KEEP_INPUT = False
-    YIELD_BATCH = False
-
-    INPUT_KEYS = "input"
-    DEAULT_INPUTS = {"input": "input"}
-    OUTPUT_KEYS = "result"
-    DEAULT_OUTPUTS = {"result": "result"}
+class BasePredictor(ABC):
 
     MODEL_FILE_PREFIX = "inference"
 
@@ -40,13 +29,8 @@ class BasePredictor(BaseComponent):
 
         # alias predict() to the __call__()
         self.predict = self.__call__
-
+        self.pkg_res = True
         self.benchmark = None
-
-    def __call__(self, input, **kwargs):
-        self.set_predictor(**kwargs)
-        for res in super().__call__(input):
-            yield res["result"]
 
     @property
     def config_path(self):
@@ -56,6 +40,28 @@ class BasePredictor(BaseComponent):
     def model_name(self) -> str:
         return self.config["Global"]["model_name"]
 
+    @classmethod
+    def get_config_path(cls, model_dir):
+        return model_dir / f"{cls.MODEL_FILE_PREFIX}.yml"
+
+    @classmethod
+    def load_config(cls, model_dir):
+        yaml_reader = YAMLReader()
+        return yaml_reader.read(cls.get_config_path(model_dir))
+
+    @property
+    def package_result(self):
+        return self._pkg_res
+
+    @package_result.setter
+    def package_result(self, pkg_res):
+        assert isinstance(pkg_res, bool)
+        self._pkg_res = pkg_res
+
+    @abstractmethod
+    def __call__(self, input, **kwargs):
+        raise NotImplementedError
+
     @abstractmethod
     def apply(self, input):
         raise NotImplementedError
@@ -63,14 +69,3 @@ class BasePredictor(BaseComponent):
     @abstractmethod
     def set_predictor(self):
         raise NotImplementedError
-
-    @classmethod
-    def get_config_path(cls, model_dir):
-        return model_dir / f"{cls.MODEL_FILE_PREFIX}.yml"
-
-    @classmethod
-    def load_config(cls, model_dir):
-        config_path = cls.get_config_path(model_dir)
-        with codecs.open(config_path, "r", "utf-8") as file:
-            dic = yaml.load(file, Loader=yaml.FullLoader)
-        return dic

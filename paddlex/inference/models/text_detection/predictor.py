@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-
-from ...utils.func_register import FuncRegister
-from ...modules.text_detection.model_list import MODELS
-from ..components import *
-from ..results import TextDetResult
-from .base import BasicPredictor
+from ....utils.func_register import FuncRegister
+from ....modules.text_detection.model_list import MODELS
+from ..base import BasicPredictor
+from ..common.vision import *
+from ..common.infer import PaddleStaticInfer
+from .processors import *
+from .result import TextDetResult
 
 
 class TextDetPredictor(BasicPredictor):
@@ -28,24 +28,47 @@ class TextDetPredictor(BasicPredictor):
     _FUNC_MAP = {}
     register = FuncRegister(_FUNC_MAP)
 
-    def _build_components(self):
+    def _build_batch_sampler(self):
+        return ImageBatchSampler()
+
+    def _get_result_class(self):
+        return TextDetResult
+
+    def _build_processors(self):
         for cfg in self.config["PreProcess"]["transform_ops"]:
             tf_key = list(cfg.keys())[0]
             func = self._FUNC_MAP[tf_key]
             args = cfg.get(tf_key, {})
             op = func(self, **args) if args else func(self)
             if op:
-                self._add_component(op)
+                self._add_processor(op)
+        self._add_processor(ImagesToBatch())
 
-        predictor = ImagePredictor(
+        predictor = PaddleStaticInfer(
             model_dir=self.model_dir,
             model_prefix=self.MODEL_FILE_PREFIX,
             option=self.pp_option,
         )
-        self._add_component(predictor)
+        self._add_processor(predictor)
 
         op = self.build_postprocess(**self.config["PostProcess"])
-        self._add_component(op)
+        self._add_processor(op)
+
+    def _set_dataflow(self):
+        self.ReadImage.inputs.img.fetch(self.batch_sampler.outputs.img)
+        self.DetResizeForTest.inputs.img.fetch(self.ReadImage.outputs.img)
+        self.NormalizeImage.inputs.img.fetch(self.DetResizeForTest.outputs.img)
+        self.ToCHWImage.inputs.img.fetch(self.NormalizeImage.outputs.img)
+        self.ImagesToBatch.inputs.img.fetch(self.ToCHWImage.outputs.img)
+        self.PaddleStaticInfer.inputs.batch.fetch(self.ImagesToBatch.outputs.batch)
+        self.DBPostProcess.inputs.pred.fetch(self.PaddleStaticInfer.outputs.pred)
+        self.DBPostProcess.inputs.img_shape.fetch(
+            self.DetResizeForTest.outputs.img_shape
+        )
+        self.result_packager.inputs.input_img.fetch(self.ReadImage.outputs.img)
+        self.result_packager.inputs.input_path.fetch(self.batch_sampler.outputs.img)
+        self.result_packager.inputs.polys.fetch(self.DBPostProcess.outputs.polys)
+        self.result_packager.inputs.scores.fetch(self.DBPostProcess.outputs.scores)
 
     @register("DecodeImage")
     def build_readimg(self, channel_first, img_mode):
@@ -99,7 +122,3 @@ class TextDetPredictor(BasicPredictor):
     @register("KeepKeys")
     def foo(self, *args, **kwargs):
         return None
-
-    def _pack_res(self, single):
-        keys = ["input_path", "dt_polys", "dt_scores"]
-        return TextDetResult({key: single[key] for key in keys})

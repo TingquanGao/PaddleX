@@ -13,19 +13,18 @@
 # limitations under the License.
 
 from abc import abstractmethod
-import inspect
 
-from ....utils.subclass_register import AutoRegisterABCMetaClass
-from ....utils.flags import (
+from ......utils.subclass_register import AutoRegisterABCMetaClass
+from ......utils.flags import (
     INFER_BENCHMARK,
     INFER_BENCHMARK_WARMUP,
 )
-from ....utils import logging
-from ...components.base import BaseComponent, ComponentsEngine
-from ...utils.pp_option import PaddlePredictorOption
-from ...utils.process_hook import generatorable_method
-from ...utils.benchmark import Benchmark
-from .base_predictor import BasePredictor
+from ......utils import logging
+from .....utils.pp_option import PaddlePredictorOption
+from .....utils.benchmark import Benchmark
+from ..base_predictor import BasePredictor
+from .processor_engine import ProcessorEngine
+from .result_packager import ResultPackager
 
 
 class BasicPredictor(
@@ -43,20 +42,24 @@ class BasicPredictor(
             pp_option.device = device
         self.pp_option = pp_option
 
-        self.components = {}
-        self._build_components()
-        self.engine = ComponentsEngine(self.components)
+        self.batch_sampler = self._build_batch_sampler()
+        self.result_packager = self._build_result_packager()
+        self.processors = {}
+        self._build_processors()
+        self._set_dataflow()
+        self.engine = ProcessorEngine(self.processors)
+        self.rtn_res = True
         logging.debug(f"{self.__class__.__name__}: {self.model_dir}")
 
         if INFER_BENCHMARK:
-            self.benchmark = Benchmark(self.components)
+            self.benchmark = Benchmark(self.processors)
 
     def __call__(self, input, **kwargs):
         self.set_predictor(**kwargs)
         if self.benchmark:
             self.benchmark.start()
             if INFER_BENCHMARK_WARMUP > 0:
-                output = super().__call__(input)
+                output = self.apply(input)
                 warmup_num = 0
                 for _ in range(INFER_BENCHMARK_WARMUP):
                     try:
@@ -68,55 +71,50 @@ class BasicPredictor(
                         )
                         break
                 self.benchmark.warmup_stop(warmup_num)
-            output = list(super().__call__(input))
+            output = list(self.apply(input))
             self.benchmark.collect(len(output))
         else:
-            yield from super().__call__(input)
+            yield from self.apply(input)
 
     def apply(self, input):
         """predict"""
-        yield from self._generate_res(self.engine(input))
-
-    @generatorable_method
-    def _generate_res(self, batch_data):
-        return [{"result": self._pack_res(data)} for data in batch_data]
-
-    def _add_component(self, cmps):
-        if not isinstance(cmps, list):
-            cmps = [cmps]
-
-        for cmp in cmps:
-            if not isinstance(cmp, (list, tuple)):
-                key = cmp.name
+        for batch in self.batch_sampler(input):
+            batch_data = self.engine(batch)
+            if self.rtn_res:
+                yield from self.result_packager(batch_data)
             else:
-                assert len(cmp) == 2
-                key = cmp[0]
-                cmp = cmp[1]
-            assert isinstance(key, str)
-            assert isinstance(cmp, BaseComponent)
-            assert (
-                key not in self.components
-            ), f"The key ({key}) has been used: {self.components}!"
-            self.components[key] = cmp
+                yield batch_data
 
     def set_predictor(self, batch_size=None, device=None, pp_option=None):
         if batch_size:
-            self.components["ReadCmp"].batch_size = batch_size
-
+            self.batch_sampler.batch_size = batch_size
             self.pp_option.batch_size = batch_size
         if device and device != self.pp_option.device:
             self.pp_option.device = device
         if pp_option and pp_option != self.pp_option:
             self.pp_option = pp_option
 
-    def _has_setter(self, attr):
-        prop = getattr(self.__class__, attr, None)
-        return isinstance(prop, property) and prop.fset is not None
+    def _add_processor(self, cmp):
+        self.processors[cmp.name] = cmp
+
+    def __getattr__(self, cmp):
+        if cmp in self.processors:
+            return self.processors.get(cmp)
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{cmp}'"
+        )
+
+    def _build_result_packager(self):
+        return ResultPackager(self._get_result_class())
 
     @abstractmethod
-    def _build_components(self):
+    def _build_batch_sampler(self):
         raise NotImplementedError
 
     @abstractmethod
-    def _pack_res(self, data):
+    def _get_result_class(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _build_processors(self):
         raise NotImplementedError
