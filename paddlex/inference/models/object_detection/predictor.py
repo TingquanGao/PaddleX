@@ -36,7 +36,7 @@ from .utils import STATIC_SHAPE_MODEL_LIST
 
 
 class DetPredictor(BasePredictor):
-
+    MODELS.remove("PP-DocLayout_plus-L")
     entities = MODELS
 
     _FUNC_MAP = {}

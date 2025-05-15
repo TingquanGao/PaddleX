@@ -34,6 +34,7 @@ from .image_multilabel_classification import MLClasPredictor
 from .image_unwarping import WarpPredictor
 from .instance_segmentation import InstanceSegPredictor
 from .keypoint_detection import KptPredictor
+from .load_gt_layout.predictor import GTDetPredictor
 from .m_3d_bev_detection import BEVDet3DPredictor
 
 # from .face_recognition import FaceRecPredictor

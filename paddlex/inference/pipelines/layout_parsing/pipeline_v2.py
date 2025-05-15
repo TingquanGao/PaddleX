@@ -24,6 +24,7 @@ from ....utils import logging
 from ....utils.deps import pipeline_requires_extra
 from ...common.batch_sampler import ImageBatchSampler
 from ...common.reader import ReadImage
+from ...models.load_gt_layout import predictor
 from ...models.object_detection.result import DetResult
 from ...utils.hpi import HPIConfig
 from ...utils.pp_option import PaddlePredictorOption
@@ -1055,6 +1056,8 @@ class _LayoutParsingPipelineV2(BasePipeline):
             doc_preprocessor_images = [
                 item["output_img"] for item in doc_preprocessor_results
             ]
+
+            predictor.IMG_PATHS = batch_data.instances
 
             layout_det_results = list(
                 self.layout_det_model(

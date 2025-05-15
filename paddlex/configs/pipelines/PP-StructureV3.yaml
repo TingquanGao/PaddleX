@@ -3,7 +3,7 @@ pipeline_name: PP-StructureV3
 
 batch_size: 8
 
-use_doc_preprocessor: True
+use_doc_preprocessor: False
 use_seal_recognition: True
 use_table_recognition: True
 use_formula_recognition: True
