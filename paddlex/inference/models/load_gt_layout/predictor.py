@@ -20,6 +20,9 @@ from ...common.batch_sampler import ImageBatchSampler
 from ..base import BasePredictor
 from ..object_detection.result import DetResult
 
+# GT_DIR = os.environ.get("LAYOUT_GT_DIR")
+GT_DIR = "/paddle/project/github/LabelLayout/datasets/label_studio/"
+
 global IMG_PATHS
 IMG_PATHS = []
 
@@ -38,9 +41,8 @@ class GTDetPredictor(BasePredictor):
         super().__init__(
             model_dir="/root/.paddlex/official_models/PP-DocLayout_plus-L/"
         )
-        label_dir = "/paddle/project/github/LabelLayout/datasets/label_studio/"
-        self.labels_dir = f"{label_dir}/labels"
-        notes_path = f"{label_dir}/notes.json"
+        self.labels_dir = os.path.join(GT_DIR, "labels")
+        notes_path = os.path.join(GT_DIR, "notes.json")
         with open(notes_path, "r") as f:
             notes = json.load(f)
 
