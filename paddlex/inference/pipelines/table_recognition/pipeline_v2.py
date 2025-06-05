@@ -145,10 +145,21 @@ class _TableRecognitionPipelineV2(BasePipeline):
                 "GeneralOCR", None
             )
 
-        self.table_orientation_classify_model = None
-        self.table_orientation_classify_config = config.get("SubModules", {}).get(
-            "TableOrientationClassify", None
+        # self.table_orientation_classify_model = None
+        # self.table_orientation_classify_config = config.get("SubModules", {}).get(
+        #     "TableOrientationClassify", None
+        # )
+        self.use_table_orientation_classify = config.get(
+            "use_table_orientation_classify", True
         )
+        if self.use_table_orientation_classify:
+            table_orientation_classify_config = config.get("SubModules", {}).get(
+                "TableOrientationClassify",
+                {"model_config_error": "config error for layout_det_model!"},
+            )
+            self.table_orientation_classify_model = self.create_model(
+                table_orientation_classify_config
+            )
 
         self._crop_by_boxes = CropByBoxes()
         self.batch_sampler = ImageBatchSampler(batch_size=1)
