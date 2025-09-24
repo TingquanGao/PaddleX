@@ -6,12 +6,14 @@ batch_size: 64
 use_queues: True
 
 use_doc_preprocessor: False
+use_layout_detection: True
+use_chart_recognition: False
 
 SubModules:
   LayoutDetection:
     module_name: layout_detection
     model_name: PP-DocLayoutV2-L #PP-DocLayoutV2-L PP-DocLayout_plus-L
-    model_dir: /paddle/project/PaddleX/pp_ocr_vl_eval_tools/models/order/layout0913-order0914_finetuned/PP-DocLayout_plus-L
+    model_dir: /paddle/project/PaddleX/pp_ocr_vl_eval_tools/models/order/layout0913-order0919_finetuned_6l/PP-DocLayout_plus-L
     batch_size: 8
     threshold: 
       0: 0.5 # abstract
@@ -57,7 +59,7 @@ SubModules:
       12: "union" # header
       13: "union" # header
       14: "large" # image
-      15: "large" # formula
+      15: "small" # formula
       16: "union" # number
       17: "large" # paragraph_title
       18: "union" # reference
@@ -74,7 +76,8 @@ SubModules:
     batch_size: 1024
     genai_config:
       backend: vllm-server
-      server_url: http://10.214.40.11:8189/v1
+      server_url: http://0.0.0.0:8189/v1
+      # server_url: http://10.214.40.11:8189/v1
 
 SubPipelines:
   DocPreprocessor:
