@@ -306,7 +306,7 @@ class _PPOCRVLPipeline(BasePipeline):
                     vl_rec_result["image"] = block_img4vl
                     vl_rec_res_list.append(vl_rec_result)
                     result_str = vl_rec_result.get("result", "")
-                    result_str, _ = truncate_repetitive_content(result_str)
+                    result_str = truncate_repetitive_content(result_str)
                     if ("\\(" in result_str and "\\)" in result_str) or (
                         "\\[" in result_str and "\\]" in result_str
                     ):
