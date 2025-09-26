@@ -439,7 +439,7 @@ def untokenize_figure_of_table(table_res_str, figure_token_map):
         token = f"[F{token_id}]"
         return figure_token_map.get(token, match.group(0))
 
-    pattern = r"$$ F(\d+) $$"
+    pattern = r"\[F(\d+)\]"
     return re.sub(pattern, repl, table_res_str)
 
 

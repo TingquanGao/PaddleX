@@ -125,6 +125,7 @@ class _PPOCRVLPipeline(BasePipeline):
         )
 
         self.vl_rec_model = self.create_model(vl_rec_config)
+        self.format_block_content = config.get("format_block_content", False)
 
         self.batch_sampler = ImageBatchSampler(batch_size=config.get("batch_size", 1))
         self.img_reader = ReadImage(format="BGR")
@@ -141,6 +142,7 @@ class _PPOCRVLPipeline(BasePipeline):
         use_doc_unwarping: Union[bool, None],
         use_layout_detection: Union[bool, None],
         use_chart_recognition: Union[bool, None],
+        format_block_content: Union[bool, None],
     ) -> dict:
         """
         Get the model settings based on the provided parameters or default values.
@@ -167,10 +169,14 @@ class _PPOCRVLPipeline(BasePipeline):
         if use_chart_recognition is None:
             use_chart_recognition = self.use_chart_recognition
 
+        if format_block_content is None:
+            format_block_content = self.format_block_content
+
         return dict(
             use_doc_preprocessor=use_doc_preprocessor,
             use_layout_detection=use_layout_detection,
             use_chart_recognition=use_chart_recognition,
+            format_block_content=format_block_content,
         )
 
     def check_model_settings_valid(self, input_params: dict) -> bool:
@@ -362,6 +368,7 @@ class _PPOCRVLPipeline(BasePipeline):
         layout_merge_bboxes_mode: Optional[str] = None,
         use_queues: Optional[bool] = None,
         prompt_label: Optional[Union[str, None]] = None,
+        format_block_content: Union[bool, None] = None,
         **kwargs,
     ) -> PPOCRVLResult:
         """
@@ -390,6 +397,7 @@ class _PPOCRVLPipeline(BasePipeline):
             use_doc_unwarping,
             use_layout_detection,
             use_chart_recognition,
+            format_block_content,
         )
 
         if not self.check_model_settings_valid(model_settings):
